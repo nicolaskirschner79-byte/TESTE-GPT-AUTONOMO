@@ -72,8 +72,9 @@ Reserva, cancelamento e reagendamento são transacionais. Preços, nomes e dura�
 
 1. Em Supabase **Authentication → URL Configuration**, configure o Site URL como `https://teste-gpt-autonomo.vercel.app` e adicione `https://teste-gpt-autonomo.vercel.app/admin.html` às Redirect URLs. Para desenvolvimento, adicione `http://localhost:5173/admin.html` e/ou `http://127.0.0.1:5173/admin.html`.
 2. Mantenha a confirmação de e-mail ativada no provedor Email. Ela faz parte da autorização do proprietário.
-3. Abra `/admin.html`, selecione **Primeiro acesso**, escolha uma senha com pelo menos 12 caracteres e confirme o e-mail.
-4. O trigger associa ao papel administrativo somente o usuário cujo e-mail verificado é `nicolaskirschner79@gmail.com`.
+3. Crie ou convide a conta `nicolaskirschner79@gmail.com` diretamente no Supabase Authentication. Defina uma senha com pelo menos 12 caracteres pelo fluxo seguro e confirme o e-mail.
+4. Abra `/admin.html` e entre com a conta do proprietário. A página oferece login e recuperação de senha; o cadastro foi removido da interface.
+5. O trigger associa ao papel administrativo somente o usuário cujo e-mail verificado é `nicolaskirschner79@gmail.com`.
 
 O cadastro de barbeiros cria somente perfis profissionais. Ele não cria usuários nem concede acesso ao painel. O servidor verifica a sessão com `getUser()` e valida o papel pelo identificador do usuário em cada operação administrativa.
 

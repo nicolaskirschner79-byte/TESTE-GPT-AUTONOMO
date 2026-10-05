@@ -52,7 +52,7 @@ O Supabase Security Advisor retornou `lints: []` após configurar políticas exp
 
 ## Limites
 
-- Senha inicial do proprietário não foi fornecida; o fluxo seguro de primeiro acesso/recuperação foi implementado.
+- Senha inicial do proprietário não foi fornecida; a criação da conta deve ser feita no Supabase Authentication. A recuperação de senha está implementada.
 - E-mails de confirmação e recuperação não foram verificados na caixa postal real.
 - Não foram recebidas credenciais/templates do WhatsApp e não foi feito envio real nem validada entrega pelo provedor.
 - Dados de teste foram removidos ou revertidos. O calendário da barbearia inicia sem reservas.
@@ -68,7 +68,7 @@ No navegador desktop, no endereço de produção:
 4. Histórico preservado após recarregar `/meus-agendamentos`.
 5. Reagendamento de 06/10 às 09:00 para 07/10 às 10:00, mantendo serviços, duração e valor.
 6. Cancelamento com confirmação e status cancelado no histórico.
-7. Painel sem sessão mostra login; Primeiro acesso mostra cadastro com senha escolhida pelo proprietário, sem acesso aos dados administrativos.
+7. Painel sem sessão mostra login, sem acesso aos dados administrativos. O cadastro pela opção Primeiro acesso, verificado na versão inicial, foi removido posteriormente a pedido do proprietário.
 
 A identidade local de QA foi limpa pela opção da aplicação. A reserva de QA, consentimento, notificações e registros de auditoria correspondentes foram removidos após os testes. A consulta final confirmou zero reservas e zero notificações. Não houve envio de WhatsApp.
 
