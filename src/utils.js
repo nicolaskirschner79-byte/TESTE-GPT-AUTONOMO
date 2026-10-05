@@ -18,7 +18,7 @@ export function phoneMask(value) {
   n=n.slice(0,11);if(n.length<3)return n;
   return `(${n.slice(0,2)}) ${n.slice(2,n.length>10?7:6)}${n.length>6?'-'+n.slice(n.length>10?7:6):''}`;
 }
-export const statusNames={agendado:'Agendado',confirmado:'Confirmado',concluido:'Concluído',cancelado:'Cancelado',nao_compareceu:'Não compareceu'};
+export const statusNames={agendado:'Agendado',confirmado:'Confirmado',em_atendimento:'Em atendimento',concluido:'Concluído',cancelado:'Cancelado',nao_compareceu:'Não compareceu'};
 export const notificationNames={pending:'Na fila',processing:'Processando',sent:'Enviado',delivered:'Entregue',read:'Lido',failed:'Falhou',unknown:'Verificar envio'};
 export function metrics(data, from, to, barber='') {
   const bookings=data.bookings.filter(b=>dayKey(b.starts_at)>=from&&dayKey(b.starts_at)<=to&&(!barber||b.barber_id===barber));
@@ -26,7 +26,7 @@ export function metrics(data, from, to, barber='') {
   const expenses=data.expenses.filter(e=>e.day>=from&&e.day<=to&&(!barber||e.barber_id===barber));
   const received=payments.reduce((s,p)=>s+(p.kind==='refund'?-1:1)*Number(p.amount),0);
   const spent=expenses.reduce((s,e)=>s+Number(e.amount),0);
-  const forecast=bookings.filter(b=>['agendado','confirmado'].includes(b.status)).reduce((s,b)=>s+Math.max(0,Number(b.total)-Number(b.paid)),0);
+  const forecast=bookings.filter(b=>['agendado','confirmado','em_atendimento'].includes(b.status)).reduce((s,b)=>s+Math.max(0,Number(b.total)-Number(b.paid)),0);
   const paidBookings=bookings.filter(b=>Number(b.paid)>0);
   return {count:bookings.length,cancelled:bookings.filter(b=>b.status==='cancelado').length,forecast,received,spent,profit:received-spent,ticket:paidBookings.length?paidBookings.reduce((s,b)=>s+Number(b.paid),0)/paidBookings.length:0};
 }

@@ -42,6 +42,9 @@ index.html                         Agendamento e histórico do dispositivo
 admin.html                         Painel e autenticação do proprietário
 src/client.js                      Fluxos dos clientes
 src/admin.js                       Gestão e financeiro
+src/agenda-model.js                Datas, filtros, linha do tempo e disponibilidade
+src/agenda-view.js                 Agenda diária/semanal e próximo cliente
+src/agenda-controller.js           Navegação e ações rápidas da agenda
 src/api.js                         API, identidade do dispositivo e Realtime
 src/utils.js                       Telefone, datas, apresentação e indicadores
 src/ui.js                          Componentes e diálogos
@@ -109,6 +112,7 @@ Novos commits na branch `main` acionam a publicação do frontend. Migrations e 
 
 - `npm test`: telefone, fuso horário, cálculos financeiros e escape de HTML.
 - `tests/hero.test.mjs` e `tests/hero.sql`: destaque da landing page, validação das opções, alterações parciais e políticas de upload. O teste SQL reverte seus dados temporários.
+- `tests/agenda.test.mjs` e `tests/agenda.sql`: visão diária/semanal, horários livres, início do atendimento, conclusão e autorização. O teste SQL reverte todos os fixtures. Veja [docs/agenda-test-report.md](docs/agenda-test-report.md).
 - `tests/database.sql`: testes transacionais com rollback do fixture. Execute com privilégios de teste no SQL Editor.
 - `node tests/remote-integration.mjs`: disputa simultânea pela API real, histórico, cancelamento, reagendamento, privacidade, Realtime e autenticação dos workers. Esse teste cria reservas de QA temporárias e registra os IDs em `test-results/cleanup.json`; remova apenas esses fixtures depois.
 - [docs/test-report.md](docs/test-report.md): resultados efetivamente executados e limites da validação.
@@ -134,3 +138,15 @@ Em **Configurações → Destaque da página inicial**, escolha **Minha imagem**
 O destaque é salvo no Supabase e atualizado nos navegadores pelo Realtime existente. Salvar a identidade visual preserva o destaque; salvar o destaque preserva nome, logo, cores, fonte e regras da agenda. Os rascunhos de ambos os formulários são preservados durante a sincronização.
 
 O bucket público `barber-hero` armazena as imagens de destaque. Somente o proprietário verificado pode enviar, listar e remover arquivos em sua pasta `images/{user_id}`; clientes podem visualizar as imagens publicadas. A migração `20261005185058_hero_highlight.sql` foi aplicada no projeto conectado.
+
+## Agenda do barbeiro
+
+Em **Agendamentos**, a visão **Dia** reúne horários, clientes, serviços, preços, almoço, bloqueios e vagas reais. A visão **Semana** mostra de segunda a domingo; clique em um dia ou cliente para abrir a agenda diária. Use as setas, o seletor de data, **Hoje**, a busca por nome/telefone e os filtros por status/profissional.
+
+Os cartões mostram agendamentos ativos ou concluídos, conclusões e horários livres no período selecionado. As vagas vêm do Supabase, considerando o serviço ativo mais curto oferecido por cada profissional. O serviço escolhido no agendamento manual determina o encaixe final: várias opções de início não representam capacidade simultânea nem garantem espaço para um serviço longo. Horários passados, almoço, fechamento, feriados, bloqueios e reservas ocupadas não são oferecidos como livres.
+
+**Confirmar → Iniciar → Concluir** organiza o fluxo do atendimento. Somente um atendimento pode ficar **Em atendimento** por profissional, e o início exige a data marcada. O atendimento em curso permanece em destaque mesmo ao consultar outro dia. Concluir abre o registro de pagamento; serviços gratuitos podem ser concluídos sem criar receita. Recebimentos parciais mantêm a opção de receber o saldo, e cancelamentos preservam pagamentos até um estorno separado.
+
+O cartão **Próximo cliente** permite consultar o telefone, enviar lembrete com autorização, reagendar, ver pagamentos ou cancelar. Clicar em um cliente troca o cartão para os dados selecionados. Lembretes entram na fila existente; envio e entrega dependem da configuração do WhatsApp e aparecem com seu estado real.
+
+As datas usam `America/Sao_Paulo`. A migração `20261005202020_daily_agenda.sql` foi aplicada no Supabase conectado. Identidade visual, destaque da landing page e autenticação administrativa continuam integrados às configurações existentes.
