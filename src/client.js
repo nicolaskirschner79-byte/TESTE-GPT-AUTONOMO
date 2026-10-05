@@ -1,4 +1,6 @@
 import './styles.css';
+import './branding.css';
+import { initBranding, applyBranding, brandMarkup, getBranding } from './branding.js';
 import { api,ensureDevice,forgetDevice,watchChanges } from './api.js';
 import { $,icon,toast,busy,modal,bookingSummary,badge,profileAvatar } from './ui.js';
 import { money,time,date,dayKey,addDays,escape,normalizePhone,phoneMask } from './utils.js';
@@ -13,7 +15,7 @@ const duration=()=>chosen().reduce((n,s)=>n+s.duration,0);
 const availableBarbers=()=>state.catalog.barbers.filter(b=>state.services.every(s=>state.catalog.barber_services.some(bs=>bs.barber_id===b.id&&bs.service_id===s)));
 
 function shell(){
- $('#app').innerHTML=`<header class="site-header"><a class="brand" href="/" aria-label="Sistema Barber, início"><span class="brand-symbol">${icon('scissors',24)}</span><span>SISTEMA <b>BARBER</b><small>SEU TEMPO. SEU ESTILO.</small></span></a><nav><button class="nav-link ${state.view==='booking'?'active':''}" data-view="booking">Agendar</button><button class="nav-link ${state.view==='history'?'active':''}" data-view="history">${icon('calendar',16)} Meus agendamentos</button><a class="owner-link" href="/admin.html" aria-label="Acessar painel do proprietário">${icon('user',18)}<span>Painel</span></a></nav></header><main id="main"></main><footer class="site-footer"><span>Sistema Barber <span class="muted">· Cuidado nos detalhes.</span></span><span>Seg–sáb, 9h às 19h <span class="footer-dot">/</span> Almoço 12h–13h</span><a href="/admin.html">Área do proprietário ${icon('arrow',14)}</a></footer>`;
+ $('#app').innerHTML=`<header class="site-header"><a class="brand" href="/" data-brand-home aria-label="${escape(getBranding().shop_name)}, início">${brandMarkup()}</a><nav><button class="nav-link ${state.view==='booking'?'active':''}" data-view="booking">Agendar</button><button class="nav-link ${state.view==='history'?'active':''}" data-view="history">${icon('calendar',16)} Meus agendamentos</button><a class="owner-link" href="/admin.html" aria-label="Acessar painel do proprietário">${icon('user',18)}<span>Painel</span></a></nav></header><main id="main"></main><footer class="site-footer"><span><span data-shop-name>${escape(getBranding().shop_name)}</span> <span class="muted">· Cuidado nos detalhes.</span></span><span>Seg–sáb, 9h às 19h <span class="footer-dot">/</span> Almoço 12h–13h</span><a href="/admin.html">Área do proprietário ${icon('arrow',14)}</a></footer>`;
  document.querySelectorAll('[data-view]').forEach(el=>el.onclick=()=>{state.view=el.dataset.view;history.replaceState(null,'',state.view==='history'?'/meus-agendamentos':'/');shell();render();});
 }
 function connection(){return `<span class="live-status"><i class="${state.connected?'connected':''}"></i><span>${state.connected?'Agenda em tempo real':'Agenda sincronizando'}</span></span>`;}
@@ -90,7 +92,8 @@ async function reschedule(b){
 }
 async function start(){
  shell();$('#main').innerHTML='<section class="loading-page"><div class="loader"></div><p>Preparando sua próxima visita…</p></section>';
- try{state.catalog=await api('catalog');render();await ensureDevice();watchChanges(async()=>{if(refreshing)return;refreshing=true;try{state.catalog=await api('catalog');if(state.view==='history'&&!document.querySelector('dialog'))await renderHistory();else if(state.step===2||state.step===3)await loadSlots();}catch{/* consulta será repetida ao reconectar */}finally{refreshing=false;}},connected=>{state.connected=connected;document.querySelectorAll('.live-status').forEach(el=>el.outerHTML=connection());});}
+ try{state.catalog=await api('catalog');applyBranding(state.catalog);render();await ensureDevice();watchChanges(async()=>{if(refreshing)return;refreshing=true;try{state.catalog=await api('catalog');applyBranding(state.catalog);if(state.view==='history'&&!document.querySelector('dialog'))await renderHistory();else if(state.step===2||state.step===3)await loadSlots();}catch{/* consulta será repetida ao reconectar */}finally{refreshing=false;}},connected=>{state.connected=connected;document.querySelectorAll('.live-status').forEach(el=>el.outerHTML=connection());});}
  catch(e){$('#main').innerHTML=`<section class="empty-state"><h1>Não conseguimos carregar a agenda.</h1><p>${escape(e.message)}</p><button class="btn primary" id="retry-app">Tentar novamente</button></section>`;$('#retry-app').onclick=start;}
 }
+initBranding();
 start();

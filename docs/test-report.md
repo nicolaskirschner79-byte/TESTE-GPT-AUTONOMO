@@ -85,3 +85,12 @@ O commit de implementação na `main` acionou a Vercel automaticamente. Deployme
 A operação de leitura dos logs de build pela integração Vercel retornou 403 para o escopo da equipe. O resultado da publicação foi confirmado pelo estado READY, pelo commit associado e pelo funcionamento efetivo do site.
 
 A configuração de Site URL/Redirect URLs do Supabase Auth não está exposta pela integração utilizada. O dashboard exigiu login, portanto essas URLs ainda precisam ser conferidas para confirmar o primeiro acesso e a recuperação de senha do proprietário.
+
+## Identidade visual — 5 de outubro de 2026
+
+- `npm test`: 7 verificações aprovadas, incluindo normalização da marca, URLs/HTML seguros e contraste de 4,5:1.
+- `npm run build`: aprovado.
+- `tests/branding.sql`: 11 verificações aprovadas; nome/logo/cores/fonte iguais no catálogo e no painel, salvamento parcial, validação e autorização. Políticas reais de Storage verificadas para inserção/leitura do proprietário e bloqueio de terceiros; a política de remoção usa a mesma restrição. Dados de teste revertidos.
+- API pública: catálogo HTTP 200 com `NICOLAS BARBER` e cancelamento de 120 minutos preservados; alterações de configurações sem sessão retornam HTTP 401; upload anônimo de logo bloqueado.
+- Conferência visual não realizada: o navegador desta sessão impediu a observação por conter credenciais nativas de uma tentativa de login anterior.
+- Advisors: sem novos problemas de RLS. Aviso existente de proteção contra senhas vazadas desativada: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection.

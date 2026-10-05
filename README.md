@@ -113,3 +113,13 @@ Novos commits na branch `main` acionam a publicação do frontend. Migrations e 
 - [docs/test-report.md](docs/test-report.md): resultados efetivamente executados e limites da validação.
 
 As chaves do Supabase não devem ser alteradas sem atualizar o ambiente da aplicação. Backups, SMTP e credenciais do WhatsApp pertencem às respectivas contas e devem ser configurados conforme o uso real.
+
+## Personalização visual
+
+No painel, abra **Configurações → Identidade visual**. É possível alterar o nome da barbearia, a frase da marca, a logo, as cores principal/cabeçalho/fundo e a fonte, com prévia antes de salvar. A mesma configuração é aplicada ao agendamento, histórico, login, painel, título da aba e favicon.
+
+As preferências são salvas no Supabase, e o sinal Realtime existente atualiza a marca nos navegadores abertos. Rascunhos do formulário não são apagados pela sincronização automática. **Restaurar cores e fonte** retorna a paleta e a tipografia padrão, preservando nome e logo.
+
+Logos aceitam PNG, JPG e WebP de até 2 MB. O bucket `barber-branding` permite leitura pública dessas imagens; inserção e remoção exigem o proprietário verificado e sua pasta pessoal. Os arquivos usam nomes únicos, sem sobrescrita. As preferências privadas e as credenciais não são expostas ao cliente.
+
+A migração `20261005171851_visual_identity.sql` foi aplicada ao projeto conectado. Os testes específicos estão em `tests/branding.test.mjs` e `tests/branding.sql`; os dados temporários de SQL são revertidos.
