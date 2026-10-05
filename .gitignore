@@ -5,6 +5,6 @@ dist/
 .env.local
 .env.*.local
 supabase/secrets.env
-test-results/
 supabase/.temp/
 supabase/.branches/
+test-results/

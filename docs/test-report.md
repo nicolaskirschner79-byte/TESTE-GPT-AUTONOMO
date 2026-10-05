@@ -1,6 +1,6 @@
 # Relatório de verificação
 
-Data: 05/10/2026. Ambiente: projeto real Supabase `GPT-AUTONOMO`, frontend local e build Vite de produção.
+Data: 05/10/2026. Ambiente: projeto real Supabase `GPT-AUTONOMO`, frontend publicado na Vercel e build Vite de produção.
 
 ## Testes unitários — 4 aprovados
 
@@ -58,4 +58,30 @@ O Supabase Security Advisor retornou `lints: []` após configurar políticas exp
 - Dados de teste foram removidos ou revertidos. O calendário da barbearia inicia sem reservas.
 - Os horários iniciais dos serviços são provisórios.
 
-Os resultados de interface e publicação serão registrados após a verificação final.
+## Interface publicada — verificação realizada
+
+No navegador desktop, no endereço de produção:
+
+1. Seleção conjunta de Corte e Sobrancelha: R$40, 50 minutos.
+2. Consulta dos horários reais, com almoço ausente da disponibilidade.
+3. Confirmação e comprovante; dados conferidos no banco real.
+4. Histórico preservado após recarregar `/meus-agendamentos`.
+5. Reagendamento de 06/10 às 09:00 para 07/10 às 10:00, mantendo serviços, duração e valor.
+6. Cancelamento com confirmação e status cancelado no histórico.
+7. Painel sem sessão mostra login; Primeiro acesso mostra cadastro com senha escolhida pelo proprietário, sem acesso aos dados administrativos.
+
+A identidade local de QA foi limpa pela opção da aplicação. A reserva de QA, consentimento, notificações e registros de auditoria correspondentes foram removidos após os testes. A consulta final confirmou zero reservas e zero notificações. Não houve envio de WhatsApp.
+
+Avaliação visual em viewport desktop de 1348 px. As regras responsivas estão implementadas; não foi feito teste em aparelho móvel real. Login administrativo completo e entrega de e-mail dependem da configuração e dos dados seguros do proprietário.
+
+![Página publicada](site-preview-1791217888986.jpg)
+
+## Publicação
+
+O commit de implementação na `main` acionou a Vercel automaticamente. Deployment `dpl_5HoNcRi1mcXqm5FxukN3koiR4ht1`, estado READY, alvo production, SHA `31637073dc7d2e3e534c58950c046521ba91b632`.
+
+`https://teste-gpt-autonomo.vercel.app/` e `/admin.html` responderam HTTP 200 em requisições sem cookies ou credenciais. O navegador carregou os assets, catálogo, API e Realtime reais. A política SSO da Vercel não foi alterada; sua remoção foi recusada pela revisão automática e tornou-se desnecessária após confirmar o acesso público ao endereço principal.
+
+A operação de leitura dos logs de build pela integração Vercel retornou 403 para o escopo da equipe. O resultado da publicação foi confirmado pelo estado READY, pelo commit associado e pelo funcionamento efetivo do site.
+
+A configuração de Site URL/Redirect URLs do Supabase Auth não está exposta pela integração utilizada. O dashboard exigiu login, portanto essas URLs ainda precisam ser conferidas para confirmar o primeiro acesso e a recuperação de senha do proprietário.

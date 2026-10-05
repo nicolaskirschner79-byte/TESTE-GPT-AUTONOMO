@@ -4,9 +4,13 @@ Sistema real de agendamento com frontend HTML/CSS/JavaScript modular, PostgreSQL
 
 ## Projetos
 
-- GitHub: `nicolaskirschner79-byte/TESTE-GPT-AUTONOMO`.
+- Site: https://teste-gpt-autonomo.vercel.app/
+- Painel: https://teste-gpt-autonomo.vercel.app/admin.html
+- GitHub: https://github.com/nicolaskirschner79-byte/TESTE-GPT-AUTONOMO.
 - Supabase: `hvsqlrqegjbjqspaqcsc` (`GPT-AUTONOMO`).
 - Vercel: `prj_U4oFw0xv6IJ5ABtGE4RzvAugc8IT` (`teste-gpt-autonomo`).
+
+![Sistema Barber publicado](docs/site-preview-1791217888986.jpg)
 
 ## Implementação
 
@@ -66,14 +70,14 @@ Reserva, cancelamento e reagendamento são transacionais. Preços, nomes e dura�
 
 ## Criar o acesso do proprietário
 
-1. Em Supabase **Authentication → URL Configuration**, configure o Site URL e adicione `https://SEU-DOMINIO/admin.html` às Redirect URLs. Para desenvolvimento, adicione `http://localhost:5173/admin.html` e/ou `http://127.0.0.1:5173/admin.html`.
+1. Em Supabase **Authentication → URL Configuration**, configure o Site URL como `https://teste-gpt-autonomo.vercel.app` e adicione `https://teste-gpt-autonomo.vercel.app/admin.html` às Redirect URLs. Para desenvolvimento, adicione `http://localhost:5173/admin.html` e/ou `http://127.0.0.1:5173/admin.html`.
 2. Mantenha a confirmação de e-mail ativada no provedor Email. Ela faz parte da autorização do proprietário.
 3. Abra `/admin.html`, selecione **Primeiro acesso**, escolha uma senha com pelo menos 12 caracteres e confirme o e-mail.
 4. O trigger associa ao papel administrativo somente o usuário cujo e-mail verificado é `nicolaskirschner79@gmail.com`.
 
 O cadastro de barbeiros cria somente perfis profissionais. Ele não cria usuários nem concede acesso ao painel. O servidor verifica a sessão com `getUser()` e valida o papel pelo identificador do usuário em cada operação administrativa.
 
-Se o usuário já existir, use **Esqueci minha senha**. O frontend nunca contém uma senha inicial. O envio e recebimento do e-mail de confirmação/recuperação dependem do serviço de e-mail do projeto e não foram testados com a caixa postal do proprietário.
+Se o usuário já existir, use **Esqueci minha senha**. O frontend nunca contém uma senha inicial. O envio e recebimento do e-mail de confirmação/recuperação dependem do serviço de e-mail do projeto e não foram testados com a caixa postal do proprietário. A integração Supabase usada nesta sessão não expõe a configuração das URLs de Auth; o acesso ao dashboard ficou na tela de login. Esse ajuste ainda precisa ser conferido antes do primeiro acesso.
 
 ## Funcionamento inicial
 
@@ -94,11 +98,11 @@ Consulte [docs/whatsapp.md](docs/whatsapp.md). É necessário ter um remetente o
 
 ## Publicação e futuras atualizações
 
-Configure o projeto Vercel com a branch `main`, framework Vite, build `npm run build` e saída `dist`. As duas variáveis públicas já estão registradas nos ambientes development, preview e production do projeto informado.
+O repositório está vinculado ao projeto Vercel informado. O commit `31637073dc7d2e3e534c58950c046521ba91b632` na branch `main` gerou automaticamente o deployment de produção `dpl_5HoNcRi1mcXqm5FxukN3koiR4ht1`, com estado READY. Framework Vite, Node 24, instalação `npm ci`, build `npm run build` e saída `dist` estão configurados. As duas variáveis públicas estão registradas em development, preview e production.
 
-Após vincular o GitHub, alterações na branch de produção podem gerar novos deployments automaticamente. Alterações em migrations e Edge Functions precisam ser aplicadas/publicadas no Supabase além do commit; não são implantadas somente por um build de frontend na Vercel. As integrações autorizadas no ChatGPT permitem executar ambas as partes conforme a solicitação.
+O endereço principal respondeu HTTP 200 a uma requisição sem cookies nem autenticação e foi testado no navegador. A proteção SSO existente foi preservada. Não foi necessário removê-la para acessar o endereço principal. O painel exige sessão do Supabase e papel administrativo, mesmo com a página pública acessível.
 
-Para um deployment público de agendamento, verifique a Deployment Protection da Vercel. O painel continua protegido por sessão e autorização no Supabase mesmo quando a página pública está acessível.
+Novos commits na branch `main` acionam a publicação do frontend. Migrations e Edge Functions precisam ser aplicadas/publicadas no Supabase além do commit; não são implantadas somente por um build na Vercel. As integrações autorizadas no ChatGPT permitem executar essas etapas conforme a solicitação, enquanto as conexões estiverem disponíveis.
 
 ## Verificação
 
