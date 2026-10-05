@@ -1,0 +1,10 @@
+project_id = "hvsqlrqegjbjqspaqcsc"
+
+[functions.barber-api]
+verify_jwt = false
+
+[functions.whatsapp-worker]
+verify_jwt = false
+
+[functions.whatsapp-webhook]
+verify_jwt = false
