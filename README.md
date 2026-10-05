@@ -108,6 +108,7 @@ Novos commits na branch `main` acionam a publicação do frontend. Migrations e 
 ## Verificação
 
 - `npm test`: telefone, fuso horário, cálculos financeiros e escape de HTML.
+- `tests/hero.test.mjs` e `tests/hero.sql`: destaque da landing page, validação das opções, alterações parciais e políticas de upload. O teste SQL reverte seus dados temporários.
 - `tests/database.sql`: testes transacionais com rollback do fixture. Execute com privilégios de teste no SQL Editor.
 - `node tests/remote-integration.mjs`: disputa simultânea pela API real, histórico, cancelamento, reagendamento, privacidade, Realtime e autenticação dos workers. Esse teste cria reservas de QA temporárias e registra os IDs em `test-results/cleanup.json`; remova apenas esses fixtures depois.
 - [docs/test-report.md](docs/test-report.md): resultados efetivamente executados e limites da validação.
@@ -123,3 +124,13 @@ As preferências são salvas no Supabase, e o sinal Realtime existente atualiza 
 Logos aceitam PNG, JPG e WebP de até 2 MB. O bucket `barber-branding` permite leitura pública dessas imagens; inserção e remoção exigem o proprietário verificado e sua pasta pessoal. Os arquivos usam nomes únicos, sem sobrescrita. As preferências privadas e as credenciais não são expostas ao cliente.
 
 A migração `20261005171851_visual_identity.sql` foi aplicada ao projeto conectado. Os testes específicos estão em `tests/branding.test.mjs` e `tests/branding.sql`; os dados temporários de SQL são revertidos.
+
+## Destaque da página inicial
+
+Em **Configurações → Destaque da página inicial**, escolha **Minha imagem** para enviar PNG, JPG ou WebP de até 5 MB. Os formatos disponíveis são arredondado, círculo, moldura e orgânico. O enquadramento pode priorizar o centro, o topo ou a parte de baixo da foto. A prévia aparece antes de salvar.
+
+**Artes do sistema** oferece tesoura clássica, barber pole e monograma com as iniciais da barbearia. As duas linhas do texto também são editáveis, com até 60 caracteres cada; deixe-as vazias para exibir apenas a imagem ou a arte. Alternar para uma arte pronta preserva a foto salva para uso posterior. **Remover imagem** remove a foto da configuração ao salvar; **Voltar ao destaque padrão** retorna à tesoura e aos textos originais.
+
+O destaque é salvo no Supabase e atualizado nos navegadores pelo Realtime existente. Salvar a identidade visual preserva o destaque; salvar o destaque preserva nome, logo, cores, fonte e regras da agenda. Os rascunhos de ambos os formulários são preservados durante a sincronização.
+
+O bucket público `barber-hero` armazena as imagens de destaque. Somente o proprietário verificado pode enviar, listar e remover arquivos em sua pasta `images/{user_id}`; clientes podem visualizar as imagens publicadas. A migração `20261005185058_hero_highlight.sql` foi aplicada no projeto conectado.

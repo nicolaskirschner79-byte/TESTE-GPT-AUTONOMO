@@ -1,11 +1,11 @@
 import { auth, api } from './api.js';
 import { $, icon, busy, toast } from './ui.js';
 import { escape } from './utils.js';
-import { DEFAULT_BRANDING, BRAND_FONTS, normalizeBranding, logoMarkup, contrastText, applyBranding } from './branding.js';
+import { DEFAULT_BRANDING, BRAND_FONTS, normalizeBranding, logoMarkup, contrastText, applyBranding, getBranding } from './branding.js';
+import { IMAGE_TYPES, validImageFile } from './image-utils.js';
 
 const BUCKET = 'barber-branding';
 const MAX_SIZE = 2 * 1024 * 1024;
-const IMAGE_TYPES = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' };
 
 export function brandingSettingsMarkup(settings) {
   const brand = normalizeBranding(settings);
@@ -18,9 +18,10 @@ export function bindBrandingSettings(settings, { onDirty, onSaved }) {
   const dispose = () => { disposed = true; imageRequest++; if (objectUrl) URL.revokeObjectURL(objectUrl); };
   const draft = () => {
     const data = new FormData(form);
-    return normalizeBranding(Object.fromEntries(data.entries()));
+    return normalizeBranding({ ...initial, ...Object.fromEntries(data.entries()) });
   };
   function preview() {
+    if (disposed || !form.isConnected) return;
     const brand = draft(), headerText = contrastText(brand.header_color);
     const previewElement = $('#branding-preview');
     previewElement.style.fontFamily = BRAND_FONTS[brand.font];
@@ -40,7 +41,7 @@ export function bindBrandingSettings(settings, { onDirty, onSaved }) {
     if (!next) return;
     const request = ++imageRequest;
     imageLoading = false;
-    if (!Object.hasOwn(IMAGE_TYPES, next.type) || next.size > MAX_SIZE || !next.size) {
+    if (!validImageFile(next, MAX_SIZE)) {
       event.target.value = ''; toast('Escolha uma imagem PNG, JPG ou WebP de até 2 MB.', true); return;
     }
     imageLoading = true;
@@ -72,7 +73,7 @@ export function bindBrandingSettings(settings, { onDirty, onSaved }) {
     if (imageLoading) { toast('Aguarde a imagem carregar na prévia antes de salvar.'); return; }
     submitting = true;
     const brand = draft(), cancellation = Number(form.elements.cancellation_minutes.value);
-    let uploaded = '', saved = false;
+    let uploaded = '', saved = false, nextLogo = logo;
     try {
       await busy(form.querySelector('[type="submit"]'), (async () => {
         // Congela os campos durante upload e gravação, preservando a prévia selecionada.
@@ -86,21 +87,25 @@ export function bindBrandingSettings(settings, { onDirty, onSaved }) {
             const path = `logos/${data.user.id}/${crypto.randomUUID()}.${IMAGE_TYPES[file.type]}`;
             const result = await storage.upload(path, file, { contentType: file.type, cacheControl: '31536000', upsert: false });
             if (result.error) throw new Error('Não foi possível enviar a logo. Confira sua conexão e tente novamente.');
-            uploaded = path; logo = storage.getPublicUrl(path).data.publicUrl;
+            uploaded = path; nextLogo = storage.getPublicUrl(path).data.publicUrl;
           }
-          const { shop_name, ...visual } = { ...brand, logo_url: logo };
+          const { shop_name, tagline, accent_color, header_color, background_color, font } = brand;
+          const visual = { tagline, accent_color, header_color, background_color, font, logo_url: nextLogo };
           await api('settings', { shop_name, cancellation_minutes: cancellation, branding: visual }, true);
-          saved = true; onDirty(false); applyBranding({ shop_name, branding: visual });
+          saved = true; logo = nextLogo; onDirty(false); applyBranding({ ...getBranding(), shop_name, ...visual });
           const oldPath = initial.logo_url !== logo && ownedPath(initial.logo_url);
+          Object.assign(initial, brand, { logo_url: logo }); file = null;
+          if (objectUrl) URL.revokeObjectURL(objectUrl); objectUrl = '';
+          if (!disposed && form.isConnected) { form.querySelector('#brand-logo-file').value = ''; $('#logo-selection').textContent = logo ? 'Logo atual salva' : 'Ícone padrão de tesoura'; preview(); }
           if (oldPath) await storage.remove([oldPath]).catch(() => {});
           await onSaved();
-        } finally { controls.forEach((control, index) => control.disabled = disabled[index]); }
+        } finally { controls.forEach((control, index) => control.disabled = disabled[index]); preview(); }
       })());
       toast('Identidade visual e preferências salvas.');
     } catch (error) {
       // Confirma a ausência de gravação antes de limpar um upload; uma resposta perdida pode ter sido salva.
       if (uploaded && !saved) {
-        try { const catalog = await api('catalog'); if (catalog.branding?.logo_url !== logo) await storage.remove([uploaded]); } catch { /* A logo fica preservada até confirmar o estado no servidor. */ }
+        try { const catalog = await api('catalog'); if (catalog.branding?.logo_url !== nextLogo) await storage.remove([uploaded]); } catch { /* A logo fica preservada até confirmar o estado no servidor. */ }
       }
       toast(error.message, true);
     } finally { submitting = false; }

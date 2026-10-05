@@ -1,9 +1,12 @@
 import { escape } from './utils.js';
 import { icon } from './ui.js';
+import { safeImageUrl } from './image-utils.js';
+import { HERO_DEFAULTS, normalizeHero, heroHighlightMarkup, heroPresetMarkup } from './hero-art.js';
 
 export const DEFAULT_BRANDING = Object.freeze({
   shop_name: 'Sistema Barber', tagline: 'Seu tempo. Seu estilo.', logo_url: '',
   accent_color: '#d83737', header_color: '#191919', background_color: '#f6f6f3', font: 'inter',
+  ...HERO_DEFAULTS,
 });
 export const BRAND_FONTS = Object.freeze({
   inter: 'Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -14,13 +17,7 @@ const CACHE_KEY = 'barber-branding-v1';
 const color = (value, fallback) => /^#[0-9a-f]{6}$/i.test(value || '') ? value.toLowerCase() : fallback;
 let current = { ...DEFAULT_BRANDING };
 
-export function safeLogoUrl(value) {
-  if (typeof value !== 'string' || value.length > 1024) return '';
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' && !url.username && !url.password ? url.href : '';
-  } catch { return ''; }
-}
+export const safeLogoUrl = safeImageUrl;
 export function normalizeBranding(settings = {}) {
   const input = settings.branding || settings;
   return {
@@ -31,6 +28,7 @@ export function normalizeBranding(settings = {}) {
     header_color: color(input.header_color, DEFAULT_BRANDING.header_color),
     background_color: color(input.background_color, DEFAULT_BRANDING.background_color),
     font: Object.hasOwn(BRAND_FONTS, input.font) ? input.font : DEFAULT_BRANDING.font,
+    ...normalizeHero(input),
   };
 }
 const rgb = value => [1, 3, 5].map(i => parseInt(value.slice(i, i + 2), 16));
@@ -75,6 +73,11 @@ export function applyBranding(settings, { persist = true } = {}) {
   document.querySelectorAll('[data-brand-symbol]').forEach(el => el.innerHTML = logoMarkup(current.logo_url));
   document.querySelectorAll('[data-brand-tagline]').forEach(el => el.textContent = current.tagline);
   document.querySelectorAll('[data-brand-home]').forEach(el => el.setAttribute('aria-label', current.shop_name + ', início'));
+  const heroKey = JSON.stringify({ shop_name: current.shop_name, ...normalizeHero(current) });
+  document.querySelectorAll('[data-hero-highlight]').forEach(el => {
+    if (el.dataset.heroConfig !== heroKey) { el.innerHTML = heroHighlightMarkup(current); el.dataset.heroConfig = heroKey; }
+  });
+  document.dispatchEvent(new CustomEvent('brandingchange'));
   document.title = `${current.shop_name} · ${location.pathname.includes('admin.html') ? 'Painel do proprietário' : 'Agendamento online'}`;
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', current.header_color);
   document.querySelector('meta[name="description"]')?.setAttribute('content', `Agende seu atendimento na ${current.shop_name}. Horários atualizados e seus agendamentos no mesmo dispositivo.`);
@@ -94,5 +97,10 @@ export function initBranding() {
   });
   document.addEventListener('error', event => {
     if (event.target instanceof HTMLImageElement && event.target.classList.contains('brand-logo')) event.target.parentElement.innerHTML = icon('scissors', 24);
+    if (event.target instanceof HTMLImageElement && event.target.classList.contains('hero-image')) {
+      const art = event.target.closest('.hero-art');
+      art.innerHTML = heroPresetMarkup(current.hero_preset, current.shop_name);
+      art.classList.remove('hero-photo'); art.classList.add('hero-preset', 'image-unavailable');
+    }
   }, true);
 }
