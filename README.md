@@ -150,3 +150,7 @@ Os cartões mostram agendamentos ativos ou concluídos, conclusões e horários 
 O cartão **Próximo cliente** permite consultar o telefone, enviar lembrete com autorização, reagendar, ver pagamentos ou cancelar. Clicar em um cliente troca o cartão para os dados selecionados. Lembretes entram na fila existente; envio e entrega dependem da configuração do WhatsApp e aparecem com seu estado real.
 
 As datas usam `America/Sao_Paulo`. A migração `20261005202020_daily_agenda.sql` foi aplicada no Supabase conectado. Identidade visual, destaque da landing page e autenticação administrativa continuam integrados às configurações existentes.
+
+Os status agora têm cores fixas e uma legenda: **confirmado em verde**, a confirmar em amarelo, em atendimento em azul, concluído em roxo, cancelado em vermelho e ausência em cinza. Horários, linhas, cartões semanais e detalhes do cliente usam a mesma identificação, independente da paleta da marca.
+
+Veja a [avaliação do site de 05/10/2026](docs/site-audit.md) para a cobertura das verificações, limitações, problemas encontrados e melhorias sugeridas. `tests/system-audit.sql` verifica cadastros, reservas, disponibilidade e operações financeiras com fixtures isolados e rollback.

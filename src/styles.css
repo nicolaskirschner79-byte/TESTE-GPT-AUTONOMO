@@ -6,3 +6,12 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .avatar{overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+
+/* Cores de status independentes da identidade visual da barbearia. */
+:root{--status-pending:#855000;--status-pending-bg:#fff4d6;--status-confirmed:#146b3a;--status-confirmed-bg:#e5f6eb;--status-progress:#185abd;--status-progress-bg:#e9f1ff;--status-completed:#7137a8;--status-completed-bg:#f2eafb;--status-cancelled:#b42336;--status-cancelled-bg:#ffebee;--status-absent:#4f5e70;--status-absent-bg:#edf1f5}
+.badge.agendado{background:var(--status-pending-bg);color:var(--status-pending)}
+.badge.confirmado{background:var(--status-confirmed-bg);color:var(--status-confirmed)}
+.badge.em_atendimento{background:var(--status-progress-bg);color:var(--status-progress)}
+.badge.concluido{background:var(--status-completed-bg);color:var(--status-completed)}
+.badge.cancelado{background:var(--status-cancelled-bg);color:var(--status-cancelled)}
+.badge.nao_compareceu{background:var(--status-absent-bg);color:var(--status-absent)}
