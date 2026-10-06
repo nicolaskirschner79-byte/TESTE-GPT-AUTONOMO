@@ -61,3 +61,77 @@ export function agendaStats(data, range, barber = '', now = new Date()) {
     absent: bookings.filter(b => b.status === 'nao_compareceu').length,
   };
 }
+
+export const CALENDAR_MIN_EVENT = 20;
+const clockMinutes = value => Number(value.slice(0, 2)) * 60 + Number(value.slice(3, 5));
+const localClock = new Intl.DateTimeFormat('en-GB', { timeZone: TIMEZONE, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+export function minuteInDay(instant, day) {
+  const key = dayKey(instant);
+  return key < day ? 0 : key > day ? 1440 : clockMinutes(localClock.format(new Date(instant)));
+}
+export const minuteLabel = minute => `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`;
+export function calendarBarbers(data, day, barber = '') {
+  return data.barbers.filter(b => (!barber || b.id === barber) && (b.active || dayBookings(data, day, b.id).length));
+}
+export function calendarColumns(data, filters, range) {
+  if (filters.view === 'week') return range.days.map(day => ({ key: day, day, barbers: calendarBarbers(data, day, filters.barber) }));
+  const barbers = calendarBarbers(data, filters.day, filters.barber);
+  return barbers.length ? barbers.map(barber => ({ key: barber.id, day: filters.day, barbers: [barber] })) : [{ key: filters.day, day: filters.day, barbers: [] }];
+}
+export function calendarWindow(data, filters, range) {
+  const limits = [];
+  for (const day of range.days) {
+    for (const barber of calendarBarbers(data, day, filters.barber)) {
+      const hours = scheduleFor(data, barber.id, day);
+      if (!hours.closed) limits.push([clockMinutes(hours.opens), clockMinutes(hours.closes)]);
+    }
+    for (const booking of dayBookings(data, day, filters.barber)) {
+      const start = minuteInDay(booking.starts_at, day);
+      limits.push([start, Math.max(minuteInDay(booking.ends_at, day), start + CALENDAR_MIN_EVENT)]);
+    }
+  }
+  const start = Math.max(0, Math.floor((limits.length ? Math.min(...limits.map(x => x[0])) : 540) / 60) * 60);
+  const end = Math.min(1440, Math.max(start + 60, Math.ceil((limits.length ? Math.max(...limits.map(x => x[1])) : 1140) / 60) * 60));
+  return { start, end, minutes: end - start, ticks: Array.from({ length: (end - start) / 60 }, (_, i) => start + i * 60) };
+}
+// Reservas sobrepostas, inclusive canceladas e de outros profissionais, ocupam faixas próprias.
+export function calendarBookings(data, day, barberIds, filters) {
+  const entries = dayBookings(data, day).filter(b => barberIds.includes(b.barber_id) && matchesBooking(b, filters.search, filters.status)).map(booking => {
+    const start = minuteInDay(booking.starts_at, day), actualEnd = minuteInDay(booking.ends_at, day);
+    return { booking, start, end: Math.min(1440, Math.max(actualEnd, start + CALENDAR_MIN_EVENT)) };
+  });
+  const result = [];
+  let group = [], groupEnd = -1;
+  const flush = () => {
+    const occupied = [];
+    for (const entry of group) {
+      let lane = occupied.findIndex(end => end <= entry.start);
+      if (lane < 0) lane = occupied.length;
+      occupied[lane] = entry.end; entry.lane = lane;
+    }
+    result.push(...group.map(entry => ({ ...entry, lanes: occupied.length })));
+    group = []; groupEnd = -1;
+  };
+  for (const entry of entries) {
+    if (entry.start >= groupEnd && group.length) flush();
+    group.push(entry); groupEnd = Math.max(groupEnd, entry.end);
+  }
+  if (group.length) flush();
+  return result;
+}
+export function calendarIntervals(data, column, window) {
+  const intervals = [], dayStart = localInstant(column.day, '00:00'), dayEnd = localInstant(addDays(column.day, 1), '00:00');
+  for (const barber of column.barbers) {
+    const h = scheduleFor(data, barber.id, column.day), label = column.barbers.length > 1 ? `${barber.name} · ` : '';
+    if (h.closed) intervals.push({ start: window.start, end: window.end, label: label + 'Fechado', kind: 'closed' });
+    else {
+      const opens = clockMinutes(h.opens), closes = clockMinutes(h.closes);
+      if (opens > window.start) intervals.push({ start: window.start, end: opens, label: label + 'Fora do expediente', kind: 'closed' });
+      if (closes < window.end) intervals.push({ start: closes, end: window.end, label: label + 'Fora do expediente', kind: 'closed' });
+      if (h.lunch_start && h.lunch_end) intervals.push({ start: clockMinutes(h.lunch_start), end: clockMinutes(h.lunch_end), label: label + 'Almoço', kind: 'lunch' });
+    }
+    data.blocks.filter(b => b.barber_id === barber.id && new Date(b.starts_at) < new Date(dayEnd) && new Date(b.ends_at) > new Date(dayStart)).forEach(b => intervals.push({ start: minuteInDay(b.starts_at, column.day), end: minuteInDay(b.ends_at, column.day), label: label + b.reason, kind: 'block' }));
+  }
+  if (!column.barbers.length) intervals.push({ start: window.start, end: window.end, label: 'Sem profissional disponível', kind: 'closed' });
+  return intervals.map(interval => ({ ...interval, start: Math.max(window.start, interval.start), end: Math.min(window.end, interval.end) })).filter(x => x.end > x.start);
+}

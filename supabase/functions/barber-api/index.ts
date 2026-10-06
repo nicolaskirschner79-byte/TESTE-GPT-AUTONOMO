@@ -1,7 +1,8 @@
 import { db, json, cors, sha, rpc, publicKeyAllowed } from '../_shared/runtime.ts';
 import { processQueue } from '../_shared/notifications.ts';
+import { notificationStatus } from '../_shared/notification-status.ts';
 
-const actions = new Set(['catalog','slots','session','mine','book','cancel','reschedule','whoami','admin_data','status','pay','refund','remind','save_barber','save_service','block','delete_block','special_hours','delete_special','expense','settings']);
+const actions = new Set(['catalog','slots','session','mine','book','cancel','reschedule','whoami','admin_data','integration_status','status','pay','refund','remind','save_barber','save_service','block','delete_block','special_hours','delete_special','expense','settings']);
 const publicActions = new Set(['catalog','slots','session','mine','book','cancel','reschedule']);
 
 Deno.serve(async req => {
@@ -29,6 +30,14 @@ Deno.serve(async req => {
       adminId = data.user.id;
     }
     if (!publicActions.has(action) && !adminId) return json({ error: 'Faça login para acessar o painel.' }, 401);
+    if (action === 'integration_status') {
+      await rpc(client, 'whoami', {}, null, adminId);
+      return json({ data: notificationStatus() });
+    }
+    if (action === 'remind' && !notificationStatus().whatsapp.configured) {
+      await rpc(client, 'whoami', {}, null, adminId);
+      return json({ error: 'O WhatsApp ainda não está configurado. O lembrete não foi colocado na fila.' }, 409);
+    }
     const result = await rpc(client, action, payload, deviceToken ? await sha(deviceToken) : null, adminId);
     if (['book','cancel','reschedule','remind'].includes(action)) EdgeRuntime.waitUntil(processQueue(client).catch(() => { /* fila persiste; cron tentará novamente */ }));
     return json({ data: result });

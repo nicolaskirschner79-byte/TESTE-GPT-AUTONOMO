@@ -2,12 +2,13 @@ import './styles.css';
 import './branding.css';
 import './hero.css';
 import { heroHighlightMarkup } from './hero-art.js';
+import { viewFromPath,viewPath } from './client-navigation.js';
 import { initBranding, applyBranding, brandMarkup, getBranding } from './branding.js';
 import { api,ensureDevice,forgetDevice,watchChanges } from './api.js';
 import { $,icon,toast,busy,modal,bookingSummary,badge,profileAvatar } from './ui.js';
 import { money,time,date,dayKey,addDays,escape,normalizePhone,phoneMask } from './utils.js';
 
-const state={catalog:null,step:1,services:[],barber:'',day:dayKey(),start:null,slots:[],loading:false,view:location.pathname.includes('meus-agendamentos')?'history':'booking',connected:false};
+const state={catalog:null,step:1,services:[],barber:'',day:dayKey(),start:null,slots:[],loading:false,view:viewFromPath(location.pathname),connected:false};
 try{state.contact=JSON.parse(localStorage.getItem('barber-contact')||'{}');}catch{state.contact={};}
 state.contact??={};
 let slotRequest=0,refreshing=false;
@@ -15,10 +16,13 @@ const chosen=()=>state.catalog.services.filter(s=>state.services.includes(s.id))
 const total=()=>chosen().reduce((n,s)=>n+Number(s.price),0);
 const duration=()=>chosen().reduce((n,s)=>n+s.duration,0);
 const availableBarbers=()=>state.catalog.barbers.filter(b=>state.services.every(s=>state.catalog.barber_services.some(bs=>bs.barber_id===b.id&&bs.service_id===s)));
+function navigate(view,{replace=false}={}){state.view=view;if(location.pathname!==viewPath(view))history[replace?'replaceState':'pushState'](null,'',viewPath(view));shell();return render();}
+window.addEventListener('popstate',()=>{state.view=viewFromPath(location.pathname);shell();if(state.catalog)render();});
 
 function shell(){
- $('#app').innerHTML=`<header class="site-header"><a class="brand" href="/" data-brand-home aria-label="${escape(getBranding().shop_name)}, início">${brandMarkup()}</a><nav><button class="nav-link ${state.view==='booking'?'active':''}" data-view="booking">Agendar</button><button class="nav-link ${state.view==='history'?'active':''}" data-view="history">${icon('calendar',16)} Meus agendamentos</button><a class="owner-link" href="/admin.html" aria-label="Acessar painel do proprietário">${icon('user',18)}<span>Painel</span></a></nav></header><main id="main"></main><footer class="site-footer"><span><span data-shop-name>${escape(getBranding().shop_name)}</span> <span class="muted">· Cuidado nos detalhes.</span></span><span>Seg–sáb, 9h às 19h <span class="footer-dot">/</span> Almoço 12h–13h</span><a href="/admin.html">Área do proprietário ${icon('arrow',14)}</a></footer>`;
- document.querySelectorAll('[data-view]').forEach(el=>el.onclick=()=>{state.view=el.dataset.view;history.replaceState(null,'',state.view==='history'?'/meus-agendamentos':'/');shell();render();});
+ $('#app').innerHTML=`<header class="site-header"><a class="brand" href="/" data-brand-home aria-label="${escape(getBranding().shop_name)}, início">${brandMarkup()}</a><nav><button class="nav-link ${state.view==='booking'?'active':''}" data-view="booking">Agendar</button><button class="nav-link ${state.view==='history'?'active':''}" data-view="history">${icon('calendar',16)} Meus agendamentos</button><a class="owner-link" href="/admin.html" aria-label="Acessar painel do proprietário">${icon('user',18)}<span>Painel</span></a></nav></header><main id="main"></main><footer class="site-footer"><span><span data-shop-name>${escape(getBranding().shop_name)}</span> <span class="muted">· Cuidado nos detalhes.</span></span><button class="text-btn" id="footer-hours">Ver horários disponíveis</button><a href="/admin.html">Área do proprietário ${icon('arrow',14)}</a></footer>`;
+ document.querySelectorAll('[data-view]').forEach(el=>el.onclick=()=>navigate(el.dataset.view));
+ $('#footer-hours').onclick=()=>{state.step=state.services.length?2:1;navigate('booking');document.querySelector('.booking-section')?.scrollIntoView({behavior:'smooth',block:'start'});};
 }
 function connection(){return `<span class="live-status"><i class="${state.connected?'connected':''}"></i><span>${state.connected?'Agenda em tempo real':'Agenda sincronizando'}</span></span>`;}
 function progress(){return `<div class="steps" aria-label="Etapas do agendamento">${['Serviços','Dia e horário','Seus dados'].map((label,i)=>`<button class="step ${state.step===i+1?'current':''} ${state.step>i+1?'complete':''}" data-step="${i+1}" ${i+1>state.step?'disabled':''}><span>${state.step>i+1?icon('check',14):`0${i+1}`}</span>${label}</button>`).join('')}</div>`;}
@@ -67,14 +71,14 @@ function confirmBooking(){
   localStorage.setItem('barber-pending-booking',JSON.stringify({fingerprint,key:idempotency}));
   try{
    const b=await api('book',{...payload,idempotency_key:idempotency});localStorage.removeItem('barber-pending-booking');localStorage.setItem('barber-contact',JSON.stringify(state.contact));
-   state.view='history';state.step=1;state.services=[];state.start=null;shell();await renderHistory();
+   state.step=1;state.services=[];state.start=null;await navigate('history',{replace:true});
    modal('Seu horário está reservado.',`<div class="success-stamp">${icon('check',32)}</div>${bookingSummary(b)}<p class="receipt-id">COMPROVANTE ${escape(b.id)}</p><p class="small-note">Acesse este comprovante em Meus agendamentos, neste dispositivo.</p>`);
   }catch(e){if(e.status===409){localStorage.removeItem('barber-pending-booking');state.step=2;state.start=null;render();loadSlots();}throw e;}
  }});
 }
 async function renderHistory(){
  $('#main').innerHTML=`<section class="history-page"><div class="section-bar"><div><span class="eyebrow dark">SEU PRÓXIMO CUIDADO</span><h1 class="page-title">Meus agendamentos<span>.</span></h1><p class="muted">Suas reservas e seu histórico, neste dispositivo.</p></div><button class="btn primary" id="new-booking">Novo agendamento ${icon('plus',18)}</button></div><div class="history-info">${icon('shield',20)}<p>Seu acesso está vinculado a este navegador. Limpar os dados ou mudar de aparelho não apaga os registros da barbearia, mas pode remover seu acesso local.</p><button class="text-btn" id="forget">Esquecer meus dados</button></div><div id="history-list"><div class="skeleton-line"></div><div class="skeleton-line"></div></div></section>`;
- $('#new-booking').onclick=()=>{state.view='booking';shell();render();};
+ $('#new-booking').onclick=()=>navigate('booking');
  $('#forget').onclick=()=>modal('Esquecer os dados deste dispositivo?',`<p>Seu nome, celular e chave de acesso serão removidos deste navegador. As reservas permanecem na barbearia e não serão canceladas.</p>`,{confirm:'Esquecer dados',onConfirm:async()=>{forgetDevice();state.contact={};await renderHistory();toast('Dados locais removidos.');}});
  try{
   await ensureDevice();const bookings=await api('mine');if(state.view!=='history')return;

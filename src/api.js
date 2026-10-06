@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { requestJson } from './transport.js';
 const url=import.meta.env.VITE_SUPABASE_URL;
 const key=import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 if(!url||!key)throw new Error('Configure as variáveis públicas do Supabase antes de iniciar.');
@@ -13,12 +14,9 @@ export function deviceToken() {
 let ready;
 export async function api(action,payload={},admin=false) {
   const headers={'Content-Type':'application/json',apikey:key};
-  if(admin){const {data}=await auth.auth.getSession();if(!data.session)throw new Error('Entre novamente no painel.');headers.Authorization=`Bearer ${data.session.access_token}`;}
+  if(admin){const {data}=await auth.auth.getSession();if(!data.session){const error=new Error('Entre novamente no painel.');error.status=401;throw error;}headers.Authorization=`Bearer ${data.session.access_token}`;}
   else headers['x-device-token']=deviceToken();
-  const response=await fetch(`${url}/functions/v1/barber-api`,{method:'POST',headers,body:JSON.stringify({action,payload})});
-  let result;try{result=await response.json();}catch{throw new Error('O servidor não respondeu. Verifique sua conexão.');}
-  if(!response.ok){const error=new Error(result.error||'Não foi possível concluir.');error.status=response.status;throw error;}
-  return result.data;
+  return requestJson(`${url}/functions/v1/barber-api`,{method:'POST',headers,body:JSON.stringify({action,payload})});
 }
 export async function ensureDevice(){return ready??=api('session').catch(e=>{ready=null;throw e;});}
 export function forgetDevice(){localStorage.removeItem(DEVICE_KEY);localStorage.removeItem('barber-contact');localStorage.removeItem('barber-pending-booking');ready=null;}

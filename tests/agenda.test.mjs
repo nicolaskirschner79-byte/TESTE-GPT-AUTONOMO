@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { agendaRange, agendaStats, timelineRows, nextBooking, primaryBookingAction, matchesBooking, scheduleFor, freeSlots } from '../src/agenda-model.js';
+import { agendaRange, agendaStats, timelineRows, nextBooking, primaryBookingAction, matchesBooking, scheduleFor, freeSlots, calendarWindow, calendarColumns, calendarBookings, calendarIntervals, minuteInDay } from '../src/agenda-model.js';
 import { agendaPageMarkup } from '../src/agenda-view.js';
 import { metrics } from '../src/utils.js';
 import { agendaFixture, fixtureFilters, fixtureNow } from './fixtures/agenda.mjs';
@@ -51,16 +51,38 @@ test('começar atendimento não apaga a previsão e mantém pagamentos e estorno
   const data=agendaFixture();data.payments=[{created_at:'2026-10-05T12:00:00-03:00',kind:'payment',amount:35}];
   assert.equal(metrics(data,fixtureFilters.day,fixtureFilters.day).forecast,90);assert.equal(metrics(data,fixtureFilters.day,fixtureFilters.day).received,35);
 });
-test('agenda renderiza controles claros, ações e cartão do próximo cliente com HTML seguro', () => {
+test('calendário mantém horário, cliente e status acessíveis sem cartões laterais', () => {
   const data=agendaFixture(),markup=agendaPageMarkup(data,fixtureFilters,fixtureNow);
-  for(const label of ['Agenda do dia','Próximo cliente','Horário livre','Intervalo de almoço','Confirmar','Iniciar','Concluir','Enviar lembrete','Reagendar'])assert.ok(markup.includes(label),label);
+  for(const label of ['Agenda do dia','Horário livre','Almoço','Confirmado','A confirmar','Em atendimento'])assert.ok(markup.includes(label),label);
   assert.ok(markup.includes('data-booking="rafael"'));assert.ok(markup.includes('id="agenda-search"'));assert.ok(markup.includes('data-agenda-view="week"'));
+  assert.ok(!markup.includes('agenda-aside'));assert.ok(!markup.includes('class="agenda-stat '));assert.ok(!markup.includes('Próximo cliente'));
+  assert.ok(markup.includes('14:00–14:40 · João Costa · Barba · Confirmado'));
   data.bookings[3].customer_name='<script>alert(1)</script>';const escaped=agendaPageMarkup(data,fixtureFilters,fixtureNow);
   assert.ok(!escaped.includes('<script>'));assert.ok(escaped.includes('&lt;script&gt;'));
-  data.bookings[3].reminder_consent=false;
-  assert.match(agendaPageMarkup(data,fixtureFilters,fixtureNow),/data-agenda-action="remind"[^>]+disabled/);
 });
-test('visão semanal sempre tem sete dias e oferece acesso à agenda completa', () => {
+test('visão semanal alinha sete dias na mesma escala de horários', () => {
   const markup=agendaPageMarkup(agendaFixture(),{...fixtureFilters,view:'week'},fixtureNow);
-  assert.equal((markup.match(/class="agenda-week-heading"/g)||[]).length,7);assert.ok(markup.includes('Agenda da semana'));assert.ok(markup.includes('Ver dia'));
+  assert.equal((markup.match(/class="agenda-column-heading/g)||[]).length,7);assert.equal((markup.match(/class="agenda-calendar-column/g)||[]).length,7);assert.ok(markup.includes('Agenda da semana'));assert.ok(markup.includes('--calendar-columns:7'));
+  assert.ok(markup.includes('data-agenda-day="2026-10-11"'));assert.equal((markup.match(/class="agenda-time-axis"/g)||[]).length,1);
+});
+test('escala acompanha expediente editado, almoço, fechamento e eventos fora da data selecionada', () => {
+  const data=agendaFixture(),range=agendaRange(fixtureFilters.day);
+  assert.deepEqual(calendarWindow(data,fixtureFilters,range),{start:540,end:1140,minutes:600,ticks:[540,600,660,720,780,840,900,960,1020,1080]});
+  data.special_hours.push({barber_id:'barber-a',day:fixtureFilters.day,opens:'07:30:00',closes:'20:15:00',lunch_start:null,lunch_end:null,closed:false});
+  const window=calendarWindow(data,fixtureFilters,range);assert.equal(window.start,420);assert.equal(window.end,1260);
+  const column=calendarColumns(data,fixtureFilters,range)[0];assert.ok(!calendarIntervals(data,column,window).some(x=>x.kind==='lunch'));
+  data.special_hours[0].closed=true;assert.ok(calendarIntervals(data,column,window).some(x=>x.kind==='closed'));
+  assert.equal(minuteInDay('2026-10-06T01:30:00Z',fixtureFilters.day),1350);
+  assert.equal(minuteInDay('2026-10-06T04:00:00Z',fixtureFilters.day),1440);
+  const outside={...data.bookings[2],id:'earlier',starts_at:'2026-10-04T15:00:00-03:00',ends_at:'2026-10-04T15:40:00-03:00'};data.bookings.push(outside);
+  const markup=agendaPageMarkup(data,fixtureFilters,fixtureNow);assert.match(markup,/class="agenda-outside"[^>]*data-booking="earlier"/);
+});
+test('sobreposições em tela preservam reservas canceladas e de outros profissionais em faixas separadas', () => {
+  const data=agendaFixture();
+  data.bookings.push({...data.bookings[3],id:'cancelled',status:'cancelado'}, {...data.bookings[3],id:'other',barber_id:'barber-b'});
+  const events=calendarBookings(data,fixtureFilters.day,['barber-a','barber-b'],fixtureFilters);
+  const overlapping=events.filter(x=>['joao','cancelled','other'].includes(x.booking.id));
+  assert.equal(new Set(overlapping.map(x=>x.lane)).size,3);assert.ok(overlapping.every(x=>x.lanes===3));
+  assert.equal(events.find(x=>x.booking.id==='matheus').lanes,1);
+  assert.equal(calendarBookings(data,fixtureFilters.day,['barber-a'],{...fixtureFilters,status:'confirmado'}).length,1);
 });

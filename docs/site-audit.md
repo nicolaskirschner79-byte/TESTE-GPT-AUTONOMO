@@ -1,5 +1,7 @@
 # Avaliação do sistema da barbearia
 
+**Atualização posterior:** financeiro, navegação e rodapé foram corrigidos, e a agenda foi simplificada em calendário. Veja [corrections.md](corrections.md) para o estado atual, os testes e as duas pendências externas. O relatório abaixo registra o estado encontrado antes dessas correções.
+
 Revisão de 5 de outubro de 2026. Site: https://teste-gpt-autonomo.vercel.app/. Marca observada em produção: **GORDIN 244 DU CORTE**.
 
 ## Alteração realizada

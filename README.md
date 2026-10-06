@@ -141,16 +141,18 @@ O bucket público `barber-hero` armazena as imagens de destaque. Somente o propr
 
 ## Agenda do barbeiro
 
-Em **Agendamentos**, a visão **Dia** reúne horários, clientes, serviços, preços, almoço, bloqueios e vagas reais. A visão **Semana** mostra de segunda a domingo; clique em um dia ou cliente para abrir a agenda diária. Use as setas, o seletor de data, **Hoje**, a busca por nome/telefone e os filtros por status/profissional.
+Em **Agendamentos**, escolha **Dia** ou **Semana**. O calendário alinha os atendimentos pela hora: uma coluna por profissional no dia e sete colunas na semana. Use Hoje, as setas, a data, a busca e os filtros de status/profissional. A grade tem rolagem com cabeçalhos fixos; a posição é preservada durante a sincronização.
 
-Os cartões mostram agendamentos ativos ou concluídos, conclusões e horários livres no período selecionado. As vagas vêm do Supabase, considerando o serviço ativo mais curto oferecido por cada profissional. O serviço escolhido no agendamento manual determina o encaixe final: várias opções de início não representam capacidade simultânea nem garantem espaço para um serviço longo. Horários passados, almoço, fechamento, feriados, bloqueios e reservas ocupadas não são oferecidos como livres.
+**Confirmado em verde**, a confirmar em amarelo, em atendimento em azul, concluído em roxo, cancelado em vermelho e ausência em cinza. Os cartões mostram horário, nome e serviço, com legenda e texto acessível. Reservas que se sobrepõem na visualização recebem faixas distintas, inclusive cancelamentos e atendimentos de profissionais diferentes.
 
-**Confirmar → Iniciar → Concluir** organiza o fluxo do atendimento. Somente um atendimento pode ficar **Em atendimento** por profissional, e o início exige a data marcada. O atendimento em curso permanece em destaque mesmo ao consultar outro dia. Concluir abre o registro de pagamento; serviços gratuitos podem ser concluídos sem criar receita. Recebimentos parciais mantêm a opção de receber o saldo, e cancelamentos preservam pagamentos até um estorno separado.
+Clique no atendimento para consultar os detalhes e usar Confirmar, Iniciar, Concluir/pagamento, ausência, lembrete, cancelamento e reagendamento. Os cartões de contadores e o painel lateral foram substituídos por um resumo curto. O atendimento em curso permanece acessível mesmo fora do período selecionado.
 
-O cartão **Próximo cliente** permite consultar o telefone, enviar lembrete com autorização, reagendar, ver pagamentos ou cancelar. Clicar em um cliente troca o cartão para os dados selecionados. Lembretes entram na fila existente; envio e entrega dependem da configuração do WhatsApp e aparecem com seu estado real.
+Os atalhos + oferecem somente vagas consultadas no Supabase. A duração do serviço escolhido determina o encaixe final. Almoço, bloqueios, folgas e horários especiais vêm dos dados reais. As datas usam `America/Sao_Paulo`. A migração `20261005202020_daily_agenda.sql` permanece aplicada; o redesenho não exige outra migration.
 
-As datas usam `America/Sao_Paulo`. A migração `20261005202020_daily_agenda.sql` foi aplicada no Supabase conectado. Identidade visual, destaque da landing page e autenticação administrativa continuam integrados às configurações existentes.
+## Correções da avaliação
 
-Os status agora têm cores fixas e uma legenda: **confirmado em verde**, a confirmar em amarelo, em atendimento em azul, concluído em roxo, cancelado em vermelho e ausência em cinza. Horários, linhas, cartões semanais e detalhes do cliente usam a mesma identificação, independente da paleta da marca.
+Os indicadores diários e o gráfico dos últimos sete dias usam uma consulta independente do período financeiro. As rotas públicas são atualizadas em todas as transições e acompanham Voltar/Avançar. O rodapé direciona para os horários reais, sem informar um expediente fixo. Requisições têm timeout de 15 segundos sem repetir automaticamente operações.
 
-Veja a [avaliação do site de 05/10/2026](docs/site-audit.md) para a cobertura das verificações, limitações, problemas encontrados e melhorias sugeridas. `tests/system-audit.sql` verifica cadastros, reservas, disponibilidade e operações financeiras com fixtures isolados e rollback.
+Em **Notificações** e **Configurações**, o proprietário vê a situação do WhatsApp e os itens faltantes sem expor credenciais. A API bloqueia novos lembretes sem configuração de envio. As credenciais reais da Meta ainda precisam ser fornecidas pelo canal seguro do Supabase; o código não pode substituí-las. A organização está no plano Free e o aviso sobre proteção contra senhas vazadas continua pendente de um recurso de plano pago.
+
+Consulte [docs/corrections.md](docs/corrections.md) para resultados e limites dos testes, e [docs/site-audit.md](docs/site-audit.md) para a avaliação original. `tests/system-audit.sql` usa fixtures isolados com rollback para verificar cadastros, reservas, disponibilidade e operações financeiras.

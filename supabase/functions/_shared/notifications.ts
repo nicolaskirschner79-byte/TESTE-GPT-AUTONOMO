@@ -1,4 +1,5 @@
 import { db } from './runtime.ts';
+import { notificationStatus } from './notification-status.ts';
 
 type Job = { id: string; recipient: string; kind: string; attempts: number; payload: any };
 const displayDate = (instant: string) => new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' }).format(new Date(instant));
@@ -17,7 +18,7 @@ export async function processQueue(client = db()) {
   const reminderTemplate = Deno.env.get('WHATSAPP_REMINDER_TEMPLATE');
   const version = Deno.env.get('WHATSAPP_GRAPH_VERSION');
   // Não retirar da fila enquanto a integração externa ainda não foi configurada.
-  if (!token || !phoneId || !ownerTemplate || !reminderTemplate || !version) return { configured: false, processed: 0 };
+  if (!notificationStatus().whatsapp.configured) return { ...notificationStatus().whatsapp, processed: 0 };
   const { data, error } = await client.rpc('barber_queue', { p_action: 'claim' });
   if (error) throw error;
   let processed = 0;
