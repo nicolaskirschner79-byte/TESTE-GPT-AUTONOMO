@@ -48,3 +48,24 @@ Na consulta após a atualização havia 7 reservas reais, 3 pagamentos e 11 mens
 **Senhas vazadas:** a documentação do Supabase informa a disponibilidade no plano Pro ou superior: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection. A integração desta sessão não oferece alteração das configurações de Auth nem de plano. Esse aviso não foi eliminado e não deve ser confundido com uma correção de frontend.
 
 A inspeção completa da interface autenticada depende de uma sessão segura do proprietário no navegador de teste. A confirmação de entrega de WhatsApp e o e-mail de recuperação continuam sem teste externo completo. Os testes de banco e apresentação não substituem essas verificações.
+
+## Complemento de 6 de outubro de 2026
+
+- O calendário agora prioriza os agendamentos. Os atalhos de vagas aparecem somente ao ativar **Horários livres**, mantendo as vagas retornadas pelo servidor e preservando a rolagem.
+- Todos os cartões, inclusive serviços curtos, usam símbolos além das cores. A legenda usa os mesmos símbolos e os nomes completos; a descrição acessível mantém cliente, serviço, intervalo e status.
+- Dias e semanas sem reservas exibem uma indicação clara, sem acrescentar painéis laterais.
+- O alerta da integração WhatsApp também aparece na visão geral. O diagnóstico já era consultado nessa tela, mas não era apresentado.
+- Os detalhes distinguem **Receber saldo**, **Concluir atendimento** (serviços gratuitos) e **Concluir e registrar pagamento**. O pagamento continua seguindo as regras existentes do banco.
+
+### Verificação deste complemento
+
+O fluxo revisado é: escolha de dia/semana no painel → consulta administrativa autorizada → reservas e vagas do Supabase → grade de horários e diálogo do atendimento.
+
+- 32 testes locais aprovados e build de produção aprovado.
+- No navegador de produção, a ação **Novo agendamento** saiu de `/meus-agendamentos` para `/`; o recarregamento iniciou a página de agendamento.
+- Consultas de leitura confirmaram o plano Free, o aviso de proteção contra senhas vazadas desativada e 12 mensagens pendentes no momento da revisão. Esses números podem mudar com o uso real.
+- Os testes SQL com fixtures e rollback não foram executados nesta revisão: a aprovação automática os bloqueou por envolverem mutações no banco de produção. As verificações SQL aprovadas na revisão anterior permanecem registradas acima e não representam uma nova execução.
+- Uma chamada de teste ao worker também foi bloqueada pela aprovação automática por possível processamento de mensagens; nenhum teste de entrega externa foi concluído.
+- A revisão visual da agenda autenticada continua pendente de sessão do proprietário. O navegador de teste não permitiu abrir o servidor local; isso limita a inspeção visual deste complemento, sem indicar falha do site publicado.
+
+Nenhuma alteração de schema, plano, senha, reserva, pagamento ou credencial externa foi necessária para este complemento.

@@ -14,6 +14,7 @@ export function bindAgendaControls(root, data, filters, { onReload, onRender, on
     onRender({ focusSearch: true, selectionStart: event.target.selectionStart, selectionEnd: event.target.selectionEnd });
   };
   root.querySelector('#agenda-status').onchange = event => { filters.status = event.target.value; filters.selected = ''; onRender(); };
+  root.querySelector('[data-agenda-free-toggle]').onclick = () => { filters.showFree = !filters.showFree; onRender(); root.querySelector('[data-agenda-free-toggle]').focus({ preventScroll: true }); };
   const barber = root.querySelector('#agenda-barber');
   if (barber) barber.onchange = event => { filters.barber = event.target.value; filters.selected = ''; resetScroll(); onReload(); };
   root.querySelectorAll('[data-agenda-select]').forEach(button => button.onclick = () => {

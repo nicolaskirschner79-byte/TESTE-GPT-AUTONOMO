@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { agendaRange, agendaStats, timelineRows, nextBooking, primaryBookingAction, matchesBooking, scheduleFor, freeSlots, calendarWindow, calendarColumns, calendarBookings, calendarIntervals, minuteInDay } from '../src/agenda-model.js';
+import { agendaRange, agendaStats, timelineRows, nextBooking, primaryBookingAction, matchesBooking, scheduleFor, freeSlots, calendarWindow, calendarColumns, calendarBookings, calendarIntervals, minuteInDay, canFinishBooking } from '../src/agenda-model.js';
 import { agendaPageMarkup } from '../src/agenda-view.js';
 import { metrics } from '../src/utils.js';
 import { agendaFixture, fixtureFilters, fixtureNow } from './fixtures/agenda.mjs';
@@ -53,12 +53,38 @@ test('começar atendimento não apaga a previsão e mantém pagamentos e estorno
 });
 test('calendário mantém horário, cliente e status acessíveis sem cartões laterais', () => {
   const data=agendaFixture(),markup=agendaPageMarkup(data,fixtureFilters,fixtureNow);
-  for(const label of ['Agenda do dia','Horário livre','Almoço','Confirmado','A confirmar','Em atendimento'])assert.ok(markup.includes(label),label);
+  for(const label of ['Agenda do dia','Horários livres','Almoço','Confirmado','A confirmar','Em atendimento'])assert.ok(markup.includes(label),label);
   assert.ok(markup.includes('data-booking="rafael"'));assert.ok(markup.includes('id="agenda-search"'));assert.ok(markup.includes('data-agenda-view="week"'));
   assert.ok(!markup.includes('agenda-aside'));assert.ok(!markup.includes('class="agenda-stat '));assert.ok(!markup.includes('Próximo cliente'));
   assert.ok(markup.includes('14:00–14:40 · João Costa · Barba · Confirmado'));
   data.bookings[3].customer_name='<script>alert(1)</script>';const escaped=agendaPageMarkup(data,fixtureFilters,fixtureNow);
   assert.ok(!escaped.includes('<script>'));assert.ok(escaped.includes('&lt;script&gt;'));
+});
+test('vagas são opcionais, usam o servidor e status curtos mantêm símbolo e descrição', () => {
+  const data=agendaFixture();
+  const defaultMarkup=agendaPageMarkup(data,fixtureFilters,fixtureNow);
+  assert.ok(!defaultMarkup.includes('data-agenda-slot='));
+  const expanded=agendaPageMarkup(data,{...fixtureFilters,showFree:true},fixtureNow);
+  assert.equal((expanded.match(/data-agenda-slot=/g)||[]).length,3);
+  assert.ok(!agendaPageMarkup(data,{...fixtureFilters,showFree:true,search:'João'},fixtureNow).includes('data-agenda-slot='));
+  data.bookings[3].ends_at='2026-10-05T14:10:00-03:00';
+  const short=agendaPageMarkup(data,fixtureFilters,fixtureNow);
+  assert.match(short,/agenda-event confirmado compact[\s\S]*?agenda-event-marker" aria-hidden="true">✓/);
+  assert.ok(short.includes('14:00–14:10 · João Costa · Barba · Confirmado'));
+  data.bookings=[];
+  assert.ok(agendaPageMarkup(data,fixtureFilters,fixtureNow).includes('Nenhum agendamento neste dia.'));
+});
+test('conclusão gratuita e recebimento de saldo respeitam status e não repetem pagamento', () => {
+  for (const status of ['agendado','confirmado','em_atendimento']) {
+    assert.equal(canFinishBooking({status,total:35,paid:35}),false);
+    assert.equal(canFinishBooking({status,total:35,paid:20}),true);
+    assert.equal(canFinishBooking({status,total:0,paid:0}),true);
+  }
+  assert.equal(canFinishBooking({status:'concluido',total:35,paid:20}),true);
+  assert.equal(canFinishBooking({status:'concluido',total:35,paid:35}),false);
+  assert.equal(canFinishBooking({status:'cancelado',total:35,paid:0}),false);
+  assert.equal(canFinishBooking({status:'nao_compareceu',total:35,paid:0}),false);
+  assert.equal(canFinishBooking({status:'em_atendimento',total:0,paid:0}),true);
 });
 test('visão semanal alinha sete dias na mesma escala de horários', () => {
   const markup=agendaPageMarkup(agendaFixture(),{...fixtureFilters,view:'week'},fixtureNow);
