@@ -1,8 +1,8 @@
 import { db, json, cors, sha, rpc, publicKeyAllowed } from '../_shared/runtime.ts';
-import { processQueue } from '../_shared/notifications.ts';
-import { notificationStatus } from '../_shared/notification-status.ts';
+import { processQueue, loadWhatsAppConfig, connectionStatus } from '../_shared/notifications.ts';
+import { configFromInput, validateConnection } from '../_shared/whatsapp-config.ts';
 
-const actions = new Set(['catalog','slots','session','mine','book','cancel','reschedule','whoami','admin_data','integration_status','status','pay','refund','remind','save_barber','save_service','block','delete_block','special_hours','delete_special','expense','settings']);
+const actions = new Set(['catalog','slots','session','mine','book','cancel','reschedule','whoami','admin_data','integration_status','whatsapp_connect','whatsapp_automation','status','pay','refund','remind','save_barber','save_service','block','delete_block','special_hours','delete_special','expense','settings']);
 const publicActions = new Set(['catalog','slots','session','mine','book','cancel','reschedule']);
 
 Deno.serve(async req => {
@@ -32,9 +32,19 @@ Deno.serve(async req => {
     if (!publicActions.has(action) && !adminId) return json({ error: 'Faça login para acessar o painel.' }, 401);
     if (action === 'integration_status') {
       await rpc(client, 'whoami', {}, null, adminId);
-      return json({ data: notificationStatus() });
+      return json({ data: connectionStatus(await loadWhatsAppConfig(client)) });
     }
-    if (action === 'remind' && !notificationStatus().whatsapp.configured) {
+    if (action === 'whatsapp_connect' || action === 'whatsapp_automation') {
+      await rpc(client, 'whoami', {}, null, adminId);
+      const existing = await loadWhatsAppConfig(client);
+      const config = action === 'whatsapp_connect'
+        ? await validateConnection(configFromInput(payload, existing))
+        : { ...existing, automatic_enabled: payload.enabled === true };
+      const saved = await client.rpc('barber_whatsapp_config', { p_action: 'write', p_payload: config, p_admin_id: adminId });
+      if (saved.error) throw new Error('Não foi possível salvar a conexão do WhatsApp.');
+      return json({ data: connectionStatus(config) });
+    }
+    if (action === 'remind' && !connectionStatus(await loadWhatsAppConfig(client)).whatsapp.configured) {
       await rpc(client, 'whoami', {}, null, adminId);
       return json({ error: 'O WhatsApp ainda não está configurado. O lembrete não foi colocado na fila.' }, 409);
     }

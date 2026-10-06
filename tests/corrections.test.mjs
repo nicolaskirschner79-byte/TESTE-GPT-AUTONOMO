@@ -44,7 +44,7 @@ test('erros HTTP mantêm status de autenticação e a resposta inválida gera er
   await assert.rejects(requestJson('https://example.test',{}, {fetcher:async()=>new Response('invalid')}),/respondeu corretamente/);
 });
 test('diagnóstico de WhatsApp informa campos faltantes sem expor valores de credenciais',()=>{
-  const empty=notificationStatus(()=>undefined);assert.equal(empty.whatsapp.configured,false);assert.equal(empty.whatsapp.missing.length,6);
+  const empty=notificationStatus(()=>undefined);assert.equal(empty.whatsapp.configured,false);assert.equal(empty.whatsapp.missing.length,5);
   const ready=notificationStatus(()=>'segredo-nao-pode-aparecer');assert.equal(ready.whatsapp.configured,true);assert.equal(ready.whatsapp.delivery_configured,true);
   assert.ok(!JSON.stringify(ready).includes('segredo'));assert.ok(!JSON.stringify(ready).includes('TOKEN'));
   const markup=integrationStatusMarkup(empty,[{status:'pending'},{status:'sent'}]);assert.ok(markup.includes('configuração pendente'));assert.ok(markup.includes('1 mensagem aguardando'));assert.ok(!markup.includes('segredo'));

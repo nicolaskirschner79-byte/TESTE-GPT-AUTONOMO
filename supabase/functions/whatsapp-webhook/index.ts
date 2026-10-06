@@ -1,14 +1,17 @@
 import { db } from '../_shared/runtime.ts';
+import { loadWhatsAppConfig } from '../_shared/notifications.ts';
 
 Deno.serve(async req => {
   const url = new URL(req.url);
+  let config;
+  try { config = await loadWhatsAppConfig(db()); } catch { return new Response('Webhook unavailable', { status: 503 }); }
   if (req.method === 'GET') {
-    const token = Deno.env.get('WHATSAPP_VERIFY_TOKEN');
+    const token = config.verify_token;
     if (token && url.searchParams.get('hub.mode') === 'subscribe' && url.searchParams.get('hub.verify_token') === token) return new Response(url.searchParams.get('hub.challenge'));
     return new Response('Unauthorized', { status: 401 });
   }
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
-  const secret = Deno.env.get('WHATSAPP_APP_SECRET');
+  const secret = config.app_secret;
   if (!secret) return new Response('Webhook not configured', { status: 503 });
   const raw = await req.text();
   if (raw.length > 1000000) return new Response('Too large', { status: 413 });

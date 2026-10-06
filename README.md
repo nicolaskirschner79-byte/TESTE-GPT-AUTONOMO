@@ -98,7 +98,7 @@ As durações são provisórias e devem ser ajustadas no painel. Luzes, por exem
 
 ## WhatsApp
 
-Consulte [docs/whatsapp.md](docs/whatsapp.md). É necessário ter um remetente oficial, token, Phone Number ID e templates aprovados pela Meta. O remetente deve ser diferente do celular do barbeiro. Nenhuma credencial foi recebida e nenhum envio real de WhatsApp foi feito durante a implementação.
+Consulte [docs/whatsapp.md](docs/whatsapp.md). É necessário ter um remetente oficial, token, Phone Number ID e templates aprovados pela Meta. Para receber avisos no WhatsApp do barbeiro, o destinatário precisa ser diferente do remetente. Os lembretes aos clientes podem usar o número do barbeiro como remetente. Nenhuma credencial foi recebida e nenhum envio real de WhatsApp foi feito durante a implementação.
 
 ## Publicação e futuras atualizações
 
@@ -153,7 +153,7 @@ Os atalhos + oferecem somente vagas consultadas no Supabase e aparecem inicialme
 
 Os indicadores diários e o gráfico dos últimos sete dias usam uma consulta independente do período financeiro. As rotas públicas são atualizadas em todas as transições e acompanham Voltar/Avançar. O rodapé direciona para os horários reais, sem informar um expediente fixo. Requisições têm timeout de 15 segundos sem repetir automaticamente operações.
 
-Em **Notificações** e **Configurações**, o proprietário vê a situação do WhatsApp e os itens faltantes sem expor credenciais. A API bloqueia novos lembretes sem configuração de envio. As credenciais reais da Meta ainda precisam ser fornecidas pelo canal seguro do Supabase; o código não pode substituí-las. A organização está no plano Free e o aviso sobre proteção contra senhas vazadas continua pendente de um recurso de plano pago.
+Em **Notificações** e **Configurações**, o proprietário vê a situação do WhatsApp e os itens faltantes sem expor credenciais. A API bloqueia novos lembretes sem configuração de envio. A conexão da Meta pode ser validada e salva em **Configurações → Conectar WhatsApp**, com o token criptografado no Vault. O worker gera e envia automaticamente os lembretes 30 minutos antes, com consentimento e sem duplicar o mesmo horário. A autorização da conta e a aprovação do modelo na Meta ainda precisam ser concluídas pelo proprietário. A organização está no plano Free e o aviso sobre proteção contra senhas vazadas continua pendente de um recurso de plano pago.
 
 Consulte [docs/corrections.md](docs/corrections.md) para resultados e limites dos testes, e [docs/site-audit.md](docs/site-audit.md) para a avaliação original. `tests/system-audit.sql` usa fixtures isolados com rollback para verificar cadastros, reservas, disponibilidade e operações financeiras.
 
@@ -162,3 +162,7 @@ Consulte [docs/corrections.md](docs/corrections.md) para resultados e limites do
 A migração `20261006223000_fixed_hour_appointments.sql` está aplicada. Criação pública, agendamento manual e reagendamento reservam 60 minutos. A previsão de duração de cada serviço permanece no catálogo, mas não bloqueia horários adicionais. O almoço, feriados, bloqueios e reservas existentes continuam indisponíveis. Os botões exibem intervalos completos, por exemplo **10:00–11:00** e **13:00–14:00**.
 
 As seis reservas que ocupavam a agenda de hoje em diante foram normalizadas sem modificar início, serviços, preços ou pagamentos. Registros anteriores ao dia da atualização mantêm o histórico. A regra é imposta por trigger no banco, inclusive para reagendar uma reserva antiga. Veja [a correção e a verificação](docs/fixed-hour-appointments.md).
+
+## Lembretes automáticos
+
+O cron do Supabase roda a cada minuto e envia lembretes de 30 minutos mesmo com o painel fechado. Conecte uma conta real em **Configurações → Conectar WhatsApp**. O modelo de aviso ao barbeiro é opcional; a conexão de lembretes não depende dele. Consulte [docs/whatsapp.md](docs/whatsapp.md) para requisitos e limites. `npm test` inclui um Postgres isolado em memória (PGlite), que executa a migration de lembretes e valida fila, mudanças de reserva, permissões e webhook sem tocar nos registros de produção nem enviar mensagens externas.
