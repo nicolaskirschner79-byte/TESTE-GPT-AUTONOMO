@@ -1,4 +1,6 @@
 export const TIMEZONE = 'America/Sao_Paulo';
+export const BOOKING_DURATION_MINUTES = 60;
+export const bookingEnd = start => new Date(new Date(start).getTime() + BOOKING_DURATION_MINUTES * 60000).toISOString();
 export const money = n => new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(Number(n || 0));
 export const time = d => new Intl.DateTimeFormat('pt-BR', {timeZone:TIMEZONE,hour:'2-digit',minute:'2-digit'}).format(new Date(d));
 export const date = d => new Intl.DateTimeFormat('pt-BR', {timeZone:TIMEZONE,day:'2-digit',month:'short',year:'numeric'}).format(new Date(d));

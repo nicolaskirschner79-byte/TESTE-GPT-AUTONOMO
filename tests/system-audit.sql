@@ -44,7 +44,7 @@ begin
 
   perform public.barber_rpc('save_service',jsonb_build_object('id',service,'name','QA Auditoria Corte atualizado','price',50,'duration',60,'active',true),null,actor);
   result:=public.barber_rpc('reschedule',jsonb_build_object('id',booking->>'id','start',slots->1->>'start'),token);
-  assert (result->>'total')::numeric=35 and (result->>'duration')::int=40,'Reagendamento alterou preço/duração históricos';
+  assert (result->>'total')::numeric=35 and (result->>'duration')::int=60,'Reagendamento alterou preço histórico ou janela de uma hora';
   assert result->>'status'='confirmado','Reagendamento não confirmou';
   report:=report||jsonb_build_array('Editar cadastro preserva preço e duração da reserva e do reagendamento');
 

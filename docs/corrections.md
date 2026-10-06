@@ -1,5 +1,7 @@
 # Correções e agenda em calendário
 
+**Regra atual:** cada agendamento reserva 1 hora. Veja [fixed-hour-appointments.md](fixed-hour-appointments.md). A descrição abaixo também registra as regras anteriores e seus testes.
+
 Esta atualização resolve os problemas de código apontados na [avaliação do site](site-audit.md) e substitui a agenda extensa por um calendário diário/semanal. A marca e as reservas reais continuam sendo consultadas no Supabase.
 
 ## O que mudou

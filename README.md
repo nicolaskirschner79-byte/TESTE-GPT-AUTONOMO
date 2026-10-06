@@ -147,7 +147,7 @@ Em **Agendamentos**, escolha **Dia** ou **Semana**. O calendário alinha os aten
 
 Clique no atendimento para consultar os detalhes e usar Confirmar, Iniciar, Concluir/pagamento, ausência, lembrete, cancelamento e reagendamento. Os cartões de contadores e o painel lateral foram substituídos por um resumo curto. O atendimento em curso permanece acessível mesmo fora do período selecionado.
 
-Os atalhos + oferecem somente vagas consultadas no Supabase. A duração do serviço escolhido determina o encaixe final. Almoço, bloqueios, folgas e horários especiais vêm dos dados reais. As datas usam `America/Sao_Paulo`. A migração `20261005202020_daily_agenda.sql` permanece aplicada; o redesenho não exige outra migration.
+Os atalhos + oferecem somente vagas consultadas no Supabase e aparecem inicialmente; o botão Horários livres permite ocultá-los. Cada reserva ocupa exatamente 1 hora, independentemente da previsão de duração ou da quantidade de serviços. Almoço, bloqueios, folgas e horários especiais vêm dos dados reais. As datas usam `America/Sao_Paulo`. A migração `20261005202020_daily_agenda.sql` permanece aplicada; o redesenho não exige outra migration.
 
 ## Correções da avaliação
 
@@ -156,3 +156,9 @@ Os indicadores diários e o gráfico dos últimos sete dias usam uma consulta in
 Em **Notificações** e **Configurações**, o proprietário vê a situação do WhatsApp e os itens faltantes sem expor credenciais. A API bloqueia novos lembretes sem configuração de envio. As credenciais reais da Meta ainda precisam ser fornecidas pelo canal seguro do Supabase; o código não pode substituí-las. A organização está no plano Free e o aviso sobre proteção contra senhas vazadas continua pendente de um recurso de plano pago.
 
 Consulte [docs/corrections.md](docs/corrections.md) para resultados e limites dos testes, e [docs/site-audit.md](docs/site-audit.md) para a avaliação original. `tests/system-audit.sql` usa fixtures isolados com rollback para verificar cadastros, reservas, disponibilidade e operações financeiras.
+
+## Reservas fixas de uma hora
+
+A migração `20261006223000_fixed_hour_appointments.sql` está aplicada. Criação pública, agendamento manual e reagendamento reservam 60 minutos. A previsão de duração de cada serviço permanece no catálogo, mas não bloqueia horários adicionais. O almoço, feriados, bloqueios e reservas existentes continuam indisponíveis. Os botões exibem intervalos completos, por exemplo **10:00–11:00** e **13:00–14:00**.
+
+As seis reservas que ocupavam a agenda de hoje em diante foram normalizadas sem modificar início, serviços, preços ou pagamentos. Registros anteriores ao dia da atualização mantêm o histórico. A regra é imposta por trigger no banco, inclusive para reagendar uma reserva antiga. Veja [a correção e a verificação](docs/fixed-hour-appointments.md).

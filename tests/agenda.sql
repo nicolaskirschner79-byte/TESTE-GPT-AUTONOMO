@@ -25,6 +25,7 @@ begin
   (first_booking,device,professional,'QA Primeiro','5515999990000',(today+time '09:00') at time zone 'America/Sao_Paulo',(today+time '09:20') at time zone 'America/Sao_Paulo',35,20,'confirmado',gen_random_uuid()),
   (second_booking,device,professional,'QA Segundo','5515999990000',(today+time '10:00') at time zone 'America/Sao_Paulo',(today+time '10:20') at time zone 'America/Sao_Paulo',35,20,'confirmado',gen_random_uuid()),
   (free_booking,device,professional,'QA Gratuito','5515999990000',(today+time '11:00') at time zone 'America/Sao_Paulo',(today+time '11:10') at time zone 'America/Sao_Paulo',0,10,'agendado',gen_random_uuid());
+  assert (select bool_and(duration=60 and ends_at=starts_at+interval '1 hour') from barber_private.bookings where id in(first_booking,second_booking,free_booking)), 'Reserva não foi normalizada para uma hora';
   insert into barber_private.booking_items(booking_id,service_id,name,price,duration)
   values(first_booking,service,'QA Corte',35,20),(second_booking,service,'QA Corte',35,20),(free_booking,free_service,'QA Gratuito',0,10);
 
@@ -40,7 +41,7 @@ begin
 
   result:=public.barber_rpc('admin_data',jsonb_build_object('from',tomorrow,'to',tomorrow,'barber_id',professional,'include_agenda',true),null,actor);
   assert exists(select 1 from jsonb_array_elements(result->'bookings') b where b->>'id'=first_booking::text),'Atendimento em curso desapareceu fora do período';
-  assert jsonb_array_length(result->'agenda_slots')=1 and (result->'agenda_slots'->0->>'minimum_duration')::int=10,'Horários não usam serviços do profissional';
+  assert jsonb_array_length(result->'agenda_slots')=1 and (result->'agenda_slots'->0->>'minimum_duration')::int=60,'Horários não reservam uma hora';
   assert not exists(select 1 from jsonb_array_elements(result->'agenda_slots'->0->'slots') s where (s->>'start')::timestamptz at time zone 'America/Sao_Paulo'>=tomorrow+time '12:00' and (s->>'start')::timestamptz at time zone 'America/Sao_Paulo'<tomorrow+time '13:00'),'Almoço exposto como livre';
   report:=report||jsonb_build_array('Consulta diária traz andamento fora da data e vagas reais, respeitando serviços e almoço');
   slots:=barber_private.agenda_slots(tomorrow,tomorrow+6,professional);
