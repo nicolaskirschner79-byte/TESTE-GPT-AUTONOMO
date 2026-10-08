@@ -1,6 +1,7 @@
 import "./styles.css";
 import "./branding.css";
 import "./hero.css";
+import "./responsive.css";
 import { heroHighlightMarkup } from "./hero-art.js";
 import { viewFromPath, viewPath } from "./client-navigation.js";
 import {
@@ -139,7 +140,7 @@ function serviceStep() {
 }
 function scheduleStep() {
   const barbers = availableBarbers();
-  return `<div class="step-heading"><span class="step-index">02</span><div><h3>Um horário só seu.</h3><p>Escolha quem vai atender e quando você vem.</p></div></div><label class="field-label">Seu profissional</label><div class="barber-choice">${barbers.map((b) => `<button class="barber-card ${state.barber === b.id ? "selected" : ""}" data-barber="${b.id}" aria-pressed="${state.barber === b.id}">${profileAvatar(b)}<span>${escape(b.name)}<small>Profissional</small></span>${icon("check", 16)}</button>`).join("") || '<p class="empty">Nenhum profissional realiza todos os serviços selecionados. Volte e ajuste sua escolha.</p>'}</div><div class="date-heading"><label class="field-label" for="booking-date">Escolha o dia</label><input id="booking-date" type="date" min="${dayKey()}" max="${addDays(dayKey(), 180)}" value="${state.day}"></div><div class="day-strip"><button class="day-nav" id="prev-week" aria-label="Semana anterior" ${state.day === dayKey() ? "disabled" : ""}>‹</button>${Array.from(
+  return `<div class="step-heading"><span class="step-index">02</span><div><h3>Um horário só seu.</h3><p>Escolha quem vai atender e quando você vem.</p></div></div><label class="field-label">Seu profissional</label><div class="barber-choice">${barbers.map((b) => `<button class="barber-card ${state.barber === b.id ? "selected" : ""}" data-barber="${b.id}" aria-pressed="${state.barber === b.id}">${profileAvatar(b)}<span>${escape(b.name)}<small>Profissional</small></span>${icon("check", 16)}</button>`).join("") || '<p class="empty">Nenhum profissional realiza todos os serviços selecionados. Volte e ajuste sua escolha.</p>'}</div><div class="date-heading"><label class="field-label" for="booking-date">Escolha o dia</label><input id="booking-date" type="date" min="${dayKey()}" max="${addDays(dayKey(), 180)}" value="${state.day}"></div><div class="day-strip"><button class="day-nav" id="prev-week" aria-label="Semana anterior" ${state.day === dayKey() ? "disabled" : ""}>‹</button><div class="day-options" aria-label="Dias disponíveis">${Array.from(
     { length: 7 },
     (_, i) => {
       const d = addDays(state.day, i);
@@ -148,7 +149,7 @@ function scheduleStep() {
     },
   ).join(
     "",
-  )}<button class="day-nav" id="next-week" aria-label="Próxima semana">›</button></div><div class="times-heading"><label class="field-label">Horários disponíveis</label><span>Reserva de 1 hora</span></div><div id="slots" aria-live="polite">${slotMarkup()}</div><p class="small-note">${icon("clock", 14)} Horários no fuso de São Paulo. O intervalo de almoço é reservado.</p>`;
+  )}</div><button class="day-nav" id="next-week" aria-label="Próxima semana">›</button></div><div class="times-heading"><label class="field-label">Horários disponíveis</label><span>Reserva de 1 hora</span></div><div id="slots" aria-live="polite">${slotMarkup()}</div><p class="small-note">${icon("clock", 14)} Horários no fuso de São Paulo. O intervalo de almoço é reservado.</p>`;
 }
 function slotMarkup() {
   return state.loading

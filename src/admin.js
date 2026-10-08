@@ -2,6 +2,8 @@ import "./styles.css";
 import "./branding.css";
 import "./hero.css";
 import "./agenda.css";
+import "./responsive.css";
+import { bindAdminNavigation } from "./admin-navigation.js";
 import {
   adminDataRequests,
   validateFinancialPeriod,
@@ -101,6 +103,7 @@ let stopWatch,
   dataSource = "",
   loginMode = "login",
   disposeSettingsEditors;
+let navigation;
 const settingsDirty = new Set();
 const admin = (action, payload = {}) => api(action, payload, true);
 function modal(...args) {
@@ -123,6 +126,8 @@ function adminDataRequest() {
 }
 
 function login() {
+  navigation?.destroy();
+  navigation = null;
   stopWatch?.();
   disposeSettingsEditors?.();
   settingsDirty.clear();
@@ -197,8 +202,9 @@ function login() {
   };
 }
 function panelShell() {
+  navigation?.destroy();
   $("#app").innerHTML =
-    `<div class="admin-layout"><aside class="sidebar"><a href="/" class="brand">${brandMarkup("PAINEL DO PROPRIETÁRIO")}</a><div class="workspace"><span class="avatar" data-shop-initials>${escape(initials(getBranding().shop_name))}</span><span><span data-shop-name>${escape(getBranding().shop_name)}</span><small>Seu espaço de gestão</small></span><i></i></div><span class="nav-label">SEU NEGÓCIO</span><nav>${Object.entries(
+    `<div class="admin-layout"><aside class="sidebar" id="admin-navigation" aria-label="Menu do painel"><button id="close-menu" class="icon-btn sidebar-close" aria-label="Fechar menu">${icon("close")}</button><a href="/" class="brand">${brandMarkup("PAINEL DO PROPRIETÁRIO")}</a><div class="workspace"><span class="avatar" data-shop-initials>${escape(initials(getBranding().shop_name))}</span><span><span data-shop-name>${escape(getBranding().shop_name)}</span><small>Seu espaço de gestão</small></span><i></i></div><span class="nav-label">SEU NEGÓCIO</span><nav>${Object.entries(
       pages,
     )
       .map(
@@ -207,7 +213,7 @@ function panelShell() {
       )
       .join(
         "",
-      )}</nav><div class="sidebar-bottom"><a href="/" class="side-link">${icon("arrow", 18)} Abrir página de agendamento</a><button id="logout" class="side-link">${icon("logout", 18)} Sair do painel</button><div class="owner-card"><span class="avatar">N</span><span>Nicolas<small>Proprietário</small></span>${icon("shield", 15)}</div></div></aside><div class="admin-main"><header class="admin-header"><button id="menu" class="icon-btn mobile-only" aria-label="Abrir menu">${icon("grid")}</button><span class="breadcrumb">Seu negócio <span>/</span> <b id="crumb">${pages[state.page][0]}</b></span><div class="header-right"><span id="admin-live" class="live-status"><i></i><span>Sincronizando</span></span><a href="/" class="header-booking">Ver página pública ${icon("arrow", 14)}</a></div></header><main class="admin-content" id="admin-content"><div class="skeleton-line"></div><div class="skeleton-line"></div></main></div></div>`;
+      )}</nav><div class="sidebar-bottom"><a href="/" class="side-link">${icon("arrow", 18)} Abrir página de agendamento</a><button id="logout" class="side-link">${icon("logout", 18)} Sair do painel</button><div class="owner-card"><span class="avatar">N</span><span>Nicolas<small>Proprietário</small></span>${icon("shield", 15)}</div></div></aside><button class="menu-backdrop" id="menu-backdrop" aria-label="Fechar menu" tabindex="-1" hidden></button><div class="admin-main"><header class="admin-header"><button id="menu" class="icon-btn mobile-only" aria-label="Abrir menu" aria-controls="admin-navigation" aria-expanded="false">${icon("grid")}</button><span class="breadcrumb">Seu negócio <span>/</span> <b id="crumb">${pages[state.page][0]}</b></span><div class="header-right"><span id="admin-live" class="live-status"><i></i><span>Sincronizando</span></span><a href="/" class="header-booking">Ver página pública ${icon("arrow", 14)}</a></div></header><main class="admin-content" id="admin-content"><div class="skeleton-line"></div><div class="skeleton-line"></div></main></div></div>`;
   document.querySelectorAll("[data-page]").forEach(
     (el) =>
       (el.onclick = () => {
@@ -216,7 +222,7 @@ function panelShell() {
         settingsDirty.clear();
         state.page = el.dataset.page;
         state.notificationPage = 0;
-        document.querySelector(".sidebar").classList.remove("open");
+        navigation.close();
         renderPanel();
         document
           .querySelectorAll("[data-page]")
@@ -227,8 +233,7 @@ function panelShell() {
         refresh();
       }),
   );
-  $("#menu").onclick = () =>
-    document.querySelector(".sidebar").classList.toggle("open");
+  navigation = bindAdminNavigation();
   $("#logout").onclick = async () => {
     stopWatch?.();
     await auth.auth.signOut();
@@ -862,7 +867,7 @@ function editBarber(b = {}) {
         const h = state.data.hours.find(
           (h) => h.barber_id === b.id && h.weekday === i,
         );
-        return `<div class="hours-row"><label><input type="checkbox" name="day_${i}" ${h || (!b.id && i > 0) ? "checked" : ""}>${day}</label><input aria-label="Abertura ${day}" type="time" name="open_${i}" value="${h?.opens.slice(0, 5) || "09:00"}"><input aria-label="Fechamento ${day}" type="time" name="close_${i}" value="${h?.closes.slice(0, 5) || "19:00"}"><input aria-label="Início almoço ${day}" type="time" name="lunch_start_${i}" value="${h?.lunch_start?.slice(0, 5) || "12:00"}"><input aria-label="Fim almoço ${day}" type="time" name="lunch_end_${i}" value="${h?.lunch_end?.slice(0, 5) || "13:00"}"><input aria-label="Intervalo ${day}" type="number" min="60" max="60" name="slot_${i}" value="60" readonly></div>`;
+        return `<div class="hours-row"><label class="hours-day"><input type="checkbox" name="day_${i}" ${h || (!b.id && i > 0) ? "checked" : ""}>${day}</label><label class="hours-time"><span>Abertura</span><input aria-label="Abertura ${day}" type="time" name="open_${i}" value="${h?.opens.slice(0, 5) || "09:00"}"></label><label class="hours-time"><span>Fechamento</span><input aria-label="Fechamento ${day}" type="time" name="close_${i}" value="${h?.closes.slice(0, 5) || "19:00"}"></label><label class="hours-time"><span>Início almoço</span><input aria-label="Início almoço ${day}" type="time" name="lunch_start_${i}" value="${h?.lunch_start?.slice(0, 5) || "12:00"}"></label><label class="hours-time"><span>Fim almoço</span><input aria-label="Fim almoço ${day}" type="time" name="lunch_end_${i}" value="${h?.lunch_end?.slice(0, 5) || "13:00"}"></label><label class="hours-time"><span>Intervalo</span><input aria-label="Intervalo ${day}" type="number" min="60" max="60" name="slot_${i}" value="60" readonly></label></div>`;
       })
       .join(
         "",
@@ -947,7 +952,7 @@ function expensesPage() {
       `<button id="new-expense" class="btn primary">${icon("plus", 17)} Registrar despesa</button>`,
     ) +
     filters() +
-    `<section class="panel-card"><div class="panel-heading"><h3>Despesas do período</h3><strong>${money(expenses.reduce((s, e) => s + Number(e.amount), 0))}</strong></div>${expenses.length ? `<div class="table-scroll"><table><thead><tr><th>Descrição</th><th>Data</th><th>Profissional</th><th>Valor</th></tr></thead><tbody>${expenses.map((e) => `<tr><td>${escape(e.description)}</td><td>${date(e.day + "T12:00:00-03:00")}</td><td>${escape(state.data.barbers.find((b) => b.id === e.barber_id)?.name || "Barbearia")}</td><td><strong>${money(e.amount)}</strong></td></tr>`).join("")}</tbody></table></div>` : '<div class="mini-empty"><p>Nenhuma despesa cadastrada neste período.</p></div>'}</section><p class="fine-print spaced">O lucro exibido considera somente as despesas que você registrou.</p>`;
+    `<section class="panel-card"><div class="panel-heading"><h3>Despesas do período</h3><strong>${money(expenses.reduce((s, e) => s + Number(e.amount), 0))}</strong></div>${expenses.length ? `<div class="table-scroll"><table class="responsive-table" role="table"><thead><tr><th>Descrição</th><th>Data</th><th>Profissional</th><th>Valor</th></tr></thead><tbody>${expenses.map((e) => `<tr><td data-label="Descrição">${escape(e.description)}</td><td data-label="Data">${date(e.day + "T12:00:00-03:00")}</td><td data-label="Profissional">${escape(state.data.barbers.find((b) => b.id === e.barber_id)?.name || "Barbearia")}</td><td data-label="Valor"><strong>${money(e.amount)}</strong></td></tr>`).join("")}</tbody></table></div>` : '<div class="mini-empty"><p>Nenhuma despesa cadastrada neste período.</p></div>'}</section><p class="fine-print spaced">O lucro exibido considera somente as despesas que você registrou.</p>`;
   bindFilters();
   $("#new-expense").onclick = () =>
     formDialog(
@@ -978,7 +983,7 @@ function notificationsPage() {
       "Consulte os estados reais de envio e entrega.",
     ) +
     integrationStatusMarkup(state.integrations, state.data.notifications) +
-    `<div class="notification-info">${icon("bell", 22)}<p>Mensagens pendentes permanecem na fila. O envio exige que o WhatsApp Business esteja configurado. “Verificar envio” indica uma resposta ambígua do provedor, que precisa ser conferida antes de repetir.</p></div><section class="panel-card"><div class="panel-heading"><h3>Últimos 30 dias</h3><span class="tiny-label">${info.total} REGISTROS · PÁGINA ${info.page + 1}</span></div>${n.length ? `<div class="table-scroll"><table><thead><tr><th>Mensagem</th><th>Destinatário</th><th>Status</th><th>Tentativas</th><th>Última atualização / erro</th></tr></thead><tbody>${n.map((x) => `<tr><td>${x.kind === "reminder" ? "Lembrete ao cliente" : "Atualização ao barbeiro"}<small>#${escape(x.booking_id.slice(0, 8))}</small></td><td>${escape(phoneMask(x.recipient))}</td><td><span class="badge ${escape(x.status)}">${notificationNames[x.status]}</span></td><td>${x.attempts}</td><td>${date(x.updated_at)} · ${time(x.updated_at)}${x.last_error ? `<small class="danger">${escape(x.last_error)}</small>` : ""}</td></tr>`).join("")}</tbody></table></div>` : '<div class="mini-empty"><p>Ainda não há notificações na fila.</p></div>'}</section><div class="notification-pagination"><button class="btn secondary small" id="notifications-prev" ${info.page === 0 ? "disabled" : ""}>Página anterior</button><button class="btn secondary small" id="notifications-next" ${(info.page + 1) * info.page_size >= info.total ? "disabled" : ""}>Próxima página</button></div>`;
+    `<div class="notification-info">${icon("bell", 22)}<p>Mensagens pendentes permanecem na fila. O envio exige que o WhatsApp Business esteja configurado. “Verificar envio” indica uma resposta ambígua do provedor, que precisa ser conferida antes de repetir.</p></div><section class="panel-card"><div class="panel-heading"><h3>Últimos 30 dias</h3><span class="tiny-label">${info.total} REGISTROS · PÁGINA ${info.page + 1}</span></div>${n.length ? `<div class="table-scroll"><table class="responsive-table" role="table"><thead><tr><th>Mensagem</th><th>Destinatário</th><th>Status</th><th>Tentativas</th><th>Última atualização / erro</th></tr></thead><tbody>${n.map((x) => `<tr><td data-label="Mensagem">${x.kind === "reminder" ? "Lembrete ao cliente" : "Atualização ao barbeiro"}<small>#${escape(x.booking_id.slice(0, 8))}</small></td><td data-label="Destinatário">${escape(phoneMask(x.recipient))}</td><td data-label="Status"><span class="badge ${escape(x.status)}">${notificationNames[x.status]}</span></td><td data-label="Tentativas">${x.attempts}</td><td data-label="Atualização / erro">${date(x.updated_at)} · ${time(x.updated_at)}${x.last_error ? `<small class="danger">${escape(x.last_error)}</small>` : ""}</td></tr>`).join("")}</tbody></table></div>` : '<div class="mini-empty"><p>Ainda não há notificações na fila.</p></div>'}</section><div class="notification-pagination"><button class="btn secondary small" id="notifications-prev" ${info.page === 0 ? "disabled" : ""}>Página anterior</button><button class="btn secondary small" id="notifications-next" ${(info.page + 1) * info.page_size >= info.total ? "disabled" : ""}>Próxima página</button></div>`;
   $("#notifications-prev").onclick = () => {
     state.notificationPage--;
     refresh();

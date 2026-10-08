@@ -1,0 +1,1284 @@
+/* Shared layout rules, loaded after each component's visual styles. */
+html {
+  -webkit-text-size-adjust: 100%;
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-width: 0;
+}
+img {
+  max-width: 100%;
+}
+textarea {
+  resize: vertical;
+}
+input,
+select,
+textarea,
+fieldset {
+  min-width: 0;
+}
+[hidden] {
+  display: none !important;
+}
+
+.brand-copy,
+.hero > div,
+.section-bar > div,
+.summary-selections,
+.booking-summary,
+.history-detail,
+.history-info > p,
+.workspace > span,
+.owner-card > span,
+.admin-title > div,
+.panel-heading > div,
+.settings-list > span,
+.branding-editor > *,
+.hero-editor-layout > * {
+  min-width: 0;
+}
+
+.brand-symbol,
+.avatar,
+.icon-btn {
+  flex-shrink: 0;
+}
+.service-name,
+.service-desc,
+.selected-service,
+.summary-line strong,
+.history-detail,
+.manage-card,
+.settings-list,
+.integration-status,
+.notification-info,
+.appointment-customer,
+.panel-heading,
+.admin-title,
+.dialog-body,
+.owner-challenge {
+  overflow-wrap: anywhere;
+}
+
+.booking-grid {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+.service-grid,
+.settings-grid,
+.dashboard-grid,
+.manage-grid,
+.stat-grid {
+  grid-auto-rows: auto;
+}
+.service-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.service-card-bottom {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.selected-service > strong,
+.summary-total > strong {
+  flex-shrink: 0;
+}
+.btn {
+  text-align: center;
+  white-space: normal;
+}
+.service-card,
+.barber-card,
+.day-card,
+.slot {
+  touch-action: manipulation;
+}
+.barber-card {
+  min-width: min(210px, 100%);
+  max-width: 100%;
+}
+.barber-card > span:nth-child(2) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.day-strip {
+  align-items: stretch;
+}
+.day-options {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+}
+.day-nav {
+  min-width: 36px;
+  flex-shrink: 0;
+}
+.slot-grid {
+  grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+}
+.contact-form input,
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  max-width: 100%;
+}
+.admin-form input[type="date"],
+.contact-form input[type="date"] {
+  width: 100%;
+}
+.history-card {
+  min-width: 0;
+}
+.history-actions .btn {
+  min-height: 44px !important;
+}
+.history-access-actions {
+  min-width: 0;
+}
+.loading-page {
+  padding: clamp(30px, 8vw, 100px);
+  text-align: center;
+}
+.toast {
+  width: max-content;
+  overflow-wrap: anywhere;
+  bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+/* Only the dialog's content scrolls, keeping the actions reachable. */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+.dialog {
+  max-height: calc(100vh - 32px);
+  max-height: calc(
+    100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+  );
+  overflow: hidden;
+}
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.dialog-head,
+.dialog-foot {
+  flex-shrink: 0;
+}
+.dialog-head h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dialog-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+.dialog-head .icon-btn {
+  width: 44px;
+  height: 44px;
+}
+.dialog-body form:not(.admin-form) {
+  display: grid;
+  gap: 16px;
+}
+.dialog-body form:not(.admin-form) label:not(.checkbox-inline) {
+  display: grid;
+  gap: 8px;
+}
+.detail-actions > .btn {
+  min-height: 44px !important;
+}
+.detail-status {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Dense administrative data stays within its own component. */
+.admin-layout {
+  grid-template-columns: 238px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+.sidebar {
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.sidebar-bottom {
+  padding-top: 24px;
+}
+.sidebar > .brand {
+  padding-right: 18px;
+}
+.sidebar .workspace i {
+  flex-shrink: 0;
+}
+.sidebar .side-link {
+  min-height: 44px;
+}
+.sidebar .sidebar-bottom .side-link {
+  font-size: 11px;
+}
+.sidebar-close {
+  display: none;
+}
+.menu-backdrop {
+  display: none;
+}
+.admin-content {
+  width: 100%;
+}
+.stat-card > strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: clamp(20px, 2vw, 27px);
+}
+.filter-bar label {
+  min-width: 0;
+}
+.filter-bar input,
+.filter-bar select {
+  min-width: 0;
+}
+.panel-heading {
+  flex-wrap: wrap;
+}
+.finance-row {
+  gap: 12px;
+}
+.finance-row > strong {
+  flex-shrink: 0;
+}
+.appointment-time {
+  flex-shrink: 0;
+}
+.appointment-row > .badge {
+  display: inline-flex;
+}
+.table-scroll {
+  min-width: 0;
+  max-width: calc(100% + 20px);
+  overscroll-behavior-x: contain;
+}
+.table-scroll td {
+  overflow-wrap: anywhere;
+}
+.hours-editor {
+  overflow: visible;
+}
+.hours-row {
+  grid-template-columns: 60px repeat(5, minmax(0, 1fr));
+  min-width: 0;
+  gap: 8px;
+  align-items: end;
+}
+.hours-row > .hours-day {
+  min-height: 44px;
+}
+.hours-row > .hours-time {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 0;
+}
+.hours-time span {
+  font-size: 9px;
+}
+.hours-time input {
+  width: 100%;
+  min-width: 0;
+}
+.notification-pagination {
+  flex-wrap: wrap;
+}
+.logo-controls {
+  flex-wrap: wrap;
+}
+.login-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 100dvh;
+}
+.login-card {
+  align-self: center;
+}
+.login-story > .brand {
+  max-width: 100%;
+}
+.login-story h1 {
+  overflow-wrap: anywhere;
+}
+.login-secure {
+  line-height: 1.6;
+}
+.owner-challenge {
+  margin: 0 auto;
+  padding: clamp(20px, 6vh, 70px) 16px;
+}
+
+.agenda-page .agenda-filters {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.agenda-page .agenda-search {
+  min-width: 0;
+}
+.agenda-page .agenda-calendar-scroll {
+  min-width: 0;
+  max-width: 100%;
+  min-height: min(350px, 60dvh);
+  max-height: clamp(240px, calc(100dvh - 280px), 760px);
+}
+.agenda-page .agenda-calendar-grid {
+  grid-template-columns: 60px repeat(
+      var(--calendar-columns),
+      minmax(120px, 1fr)
+    );
+}
+.agenda-page .agenda-header {
+  flex-wrap: wrap;
+}
+.agenda-page .agenda-toolbar {
+  flex-wrap: wrap;
+}
+.agenda-page .agenda-date-nav {
+  min-width: 0;
+}
+.agenda-page .agenda-date-picker {
+  min-width: 0;
+  width: 180px;
+}
+.agenda-page .agenda-date-picker > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.calendar-scroll-hint {
+  display: none;
+}
+
+@media (min-width: 1600px) {
+  .booking-section {
+    max-width: 1480px;
+  }
+  .admin-content {
+    max-width: 1600px;
+    padding: 42px 48px 60px;
+  }
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+  .manage-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1250px) and (min-width: 1025px) {
+  .admin-layout {
+    grid-template-columns: 215px minmax(0, 1fr);
+  }
+  .appointment-row {
+    flex-wrap: wrap;
+  }
+  .appointment-row > .badge {
+    margin-left: 87px;
+  }
+  .appointment-row > strong {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .admin-layout {
+    display: block;
+  }
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(300px, calc(100vw - 32px));
+    height: 100dvh;
+    transform: translateX(-110%);
+    visibility: hidden;
+    transition:
+      transform 0.2s,
+      visibility 0.2s;
+    padding: max(30px, env(safe-area-inset-top)) 22px
+      max(24px, env(safe-area-inset-bottom));
+    z-index: 60;
+    box-shadow: 12px 0 50px #0003;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+    left: 0;
+  }
+  .sidebar > .brand {
+    padding-right: 32px;
+  }
+  .sidebar-close {
+    display: grid;
+    position: absolute;
+    top: 18px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+  }
+  .sidebar .side-link {
+    font-size: 13px;
+    padding: 14px 12px;
+  }
+  .menu-backdrop:not([hidden]) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    border: 0;
+    background: #0008;
+    cursor: pointer;
+  }
+  #menu {
+    display: grid !important;
+    width: 44px;
+    height: 44px;
+  }
+  .admin-header {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    height: auto;
+    min-height: 70px;
+    padding: 10px max(20px, env(safe-area-inset-left));
+  }
+  .admin-content {
+    padding: 30px clamp(20px, 4vw, 36px) 45px;
+  }
+  .breadcrumb {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.6;
+  }
+  .header-booking {
+    display: none;
+  }
+  .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .branding-editor,
+  .hero-editor-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .branding-preview-wrap,
+  .hero-preview-wrap {
+    position: static;
+    width: 100%;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .manage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .booking-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+  }
+  .booking-summary {
+    position: static;
+  }
+  .hero-highlight {
+    margin-right: 0;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6.5vw, 60px);
+  }
+  .steps {
+    gap: 20px;
+  }
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .brand-colors {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .history-card {
+    flex-wrap: wrap;
+  }
+  .history-actions {
+    flex-direction: row;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    gap: 12px;
+    padding: max(18px, env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-left)) 10px;
+  }
+  .site-header .brand {
+    max-width: 100%;
+    width: fit-content;
+  }
+  .site-header .brand-name {
+    font-size: 15px;
+  }
+  .site-header .brand small {
+    font-size: 8px;
+  }
+  .site-header nav {
+    width: 100%;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  .nav-link {
+    font-size: 12px;
+    min-height: 44px;
+    padding: 10px 6px;
+  }
+  .nav-link.active:after {
+    left: 6px;
+  }
+  .owner-link {
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    padding: 10px;
+  }
+  .hero {
+    padding: 32px 16px 38px;
+    gap: 18px;
+  }
+  .hero > div:first-child {
+    flex: 1;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 8.3vw, 49px);
+    letter-spacing: -1.8px;
+  }
+  .hero p {
+    font-size: 12px;
+  }
+  .hero-highlight {
+    width: 66px;
+    gap: 12px;
+  }
+  .hero .hero-caption {
+    font-size: 12px;
+  }
+  .hero-note-rule {
+    width: 40px;
+  }
+  .hero:has(.hero-photo) {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .booking-section,
+  .history-page {
+    padding: 28px 16px 40px;
+  }
+  .section-bar h2 {
+    font-size: clamp(21px, 5.5vw, 26px);
+  }
+  .eyebrow {
+    line-height: 1.6;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .step {
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    min-height: 52px;
+    padding-bottom: 12px;
+    font-size: 10px;
+  }
+  .step span {
+    flex-shrink: 0;
+  }
+  .service-grid {
+    gap: 10px;
+  }
+  .service-card {
+    padding: 16px 13px;
+    min-height: 180px;
+  }
+  .service-name {
+    font-size: 17px;
+  }
+  .service-desc {
+    font-size: 11px;
+  }
+  .service-card-bottom {
+    align-items: flex-start;
+  }
+  .service-card-bottom > span {
+    font-size: 10px;
+  }
+  .booking-summary {
+    padding: 20px;
+  }
+  .summary-total {
+    gap: 12px;
+  }
+  .date-heading,
+  .times-heading {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .date-heading input[type="date"] {
+    width: 100%;
+  }
+  .day-strip {
+    gap: 4px;
+  }
+  .day-nav {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .day-options {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 46px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    gap: 5px;
+    padding: 4px;
+  }
+  .day-card {
+    scroll-snap-align: start;
+    min-height: 80px;
+  }
+  .slot {
+    min-height: 48px;
+    font-size: 14px;
+  }
+  .contact-form {
+    padding: 20px 16px;
+  }
+  .contact-form label {
+    font-size: 13px;
+  }
+  .contact-form label.consent {
+    font-size: 12px;
+  }
+  .privacy-note p {
+    font-size: 12px;
+  }
+  .trust-strip {
+    padding: 25px 16px;
+  }
+  .site-footer {
+    padding: 24px 16px max(24px, env(safe-area-inset-bottom));
+  }
+  .site-footer .text-btn {
+    min-height: 44px;
+  }
+  .history-info {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px;
+  }
+  .history-info p {
+    min-width: 0;
+    font-size: 12px;
+  }
+  .history-access-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    gap: 4px 14px;
+  }
+  .history-info button {
+    margin: 0;
+    min-height: 44px;
+    white-space: normal;
+    font-size: 12px;
+  }
+  .history-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .history-date {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 0 14px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .history-date svg {
+    margin: 0;
+  }
+  .history-detail {
+    min-width: 0;
+  }
+  .history-detail p {
+    font-size: 12px;
+  }
+  .history-actions {
+    gap: 8px;
+  }
+  .history-actions > .btn {
+    flex: 1 1 110px;
+  }
+  .page-title {
+    font-size: clamp(27px, 7vw, 34px);
+  }
+  .empty-state {
+    padding: 45px 10px;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+  select,
+  textarea,
+  .login-card input,
+  .branding-editor input,
+  .branding-editor select,
+  .hero-editor-layout input,
+  .hero-editor-layout select,
+  .agenda-page .agenda-search input {
+    font-size: 16px !important;
+    min-height: 46px;
+  }
+  input[type="file"] {
+    width: 100%;
+  }
+  .btn.small,
+  .detail-actions .btn.small,
+  td .btn,
+  .icon-btn {
+    min-height: 44px !important;
+  }
+  .text-btn {
+    min-height: 44px;
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .form-row > label {
+    min-width: 0;
+  }
+  .checkbox-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .checkbox-grid > label,
+  .checkbox-inline {
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .checkbox-inline input {
+    flex-shrink: 0;
+  }
+  .dialog {
+    width: calc(100vw - 20px);
+  }
+  .dialog-head,
+  .dialog-body {
+    padding: 18px 16px;
+  }
+  .dialog-head {
+    gap: 10px;
+  }
+  .dialog-head h2 {
+    font-size: 19px;
+  }
+  .dialog-foot {
+    padding: 14px 16px max(14px, env(safe-area-inset-bottom));
+    gap: 8px;
+  }
+  .dialog-foot .btn {
+    flex: 1 1 100px;
+    padding-inline: 12px;
+  }
+  .dialog-body > p {
+    font-size: 13px;
+  }
+  .summary-line {
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  .admin-content {
+    padding: 24px 16px 40px;
+  }
+  .admin-header {
+    padding: 8px 16px;
+    gap: 10px;
+  }
+  .breadcrumb {
+    font-size: 11px;
+  }
+  .breadcrumb > span {
+    margin: 0 5px;
+  }
+  .header-right .live-status {
+    font-size: 9px;
+    padding: 7px;
+  }
+  .admin-title {
+    gap: 16px;
+  }
+  .admin-title > .btn {
+    width: 100%;
+    white-space: normal;
+    font-size: 13px;
+  }
+  .admin-title h1 {
+    font-size: clamp(25px, 6.8vw, 32px);
+  }
+  .admin-title p {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .filter-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .filter-bar label {
+    font-size: 12px;
+  }
+  .filter-bar input,
+  .filter-bar select {
+    height: auto;
+    max-width: 100%;
+    padding: 10px;
+  }
+  .filter-bar > button {
+    min-height: 46px !important;
+    font-size: 12px !important;
+  }
+  .stat-card {
+    padding: 16px 12px;
+  }
+  .stat-card > div {
+    font-size: 11px;
+    line-height: 1.5;
+    gap: 6px;
+  }
+  .stat-card > strong {
+    font-size: clamp(19px, 5vw, 25px);
+  }
+  .stat-card > small {
+    font-size: 10px;
+  }
+  .panel-card {
+    padding: 20px 16px;
+  }
+  .panel-heading {
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .panel-heading h3 {
+    font-size: 14px;
+  }
+  .panel-heading p {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .panel-heading > .text-btn {
+    font-size: 12px;
+  }
+  .tiny-label {
+    font-size: 9px;
+  }
+  .revenue-chart {
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .chart-column {
+    flex: 1 0 44px;
+  }
+  .chart-column > span {
+    font-size: 9px;
+    white-space: normal;
+  }
+  .chart-column > small {
+    font-size: 10px;
+  }
+  .finance-row {
+    font-size: 12px;
+  }
+  .finance-row strong {
+    font-size: 13px;
+  }
+  .fine-print {
+    font-size: 11px;
+  }
+  .appointment-row {
+    display: grid;
+    grid-template-columns: 58px 32px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .appointment-time {
+    width: auto;
+    font-size: 12px;
+  }
+  .appointment-time small,
+  .appointment-customer small {
+    font-size: 10px;
+  }
+  .appointment-customer {
+    font-size: 13px;
+  }
+  .appointment-row > .badge {
+    grid-column: 2 / 4;
+    justify-self: start;
+    font-size: 10px;
+  }
+  .appointment-row > strong {
+    grid-column: 3;
+    font-size: 13px;
+    justify-self: end;
+  }
+  .manage-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .manage-card > p,
+  .manage-services > span {
+    font-size: 12px;
+  }
+  .settings-list {
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .settings-list small {
+    font-size: 11px;
+  }
+  .notification-info p,
+  .integration-status p {
+    font-size: 12px;
+  }
+  .notification-pagination > .btn {
+    flex: 1 1 130px;
+  }
+  .brand-colors {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .branding-panel .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .branding-actions .btn,
+  .branding-actions .text-btn {
+    width: 100%;
+  }
+  .hero-source {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero-style-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .logo-controls {
+    align-items: flex-start;
+  }
+  .hours-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 14px;
+    margin: 12px 0;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+  }
+  .hours-row > .hours-day,
+  .hours-row > .hours-time:last-child {
+    grid-column: 1 / -1;
+  }
+  .hours-row > .hours-day {
+    font-size: 14px;
+  }
+  .hours-time span {
+    font-size: 12px;
+  }
+
+  .responsive-table {
+    display: block;
+    min-width: 0;
+  }
+  .responsive-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .responsive-table tbody {
+    display: grid;
+    gap: 14px;
+  }
+  .responsive-table tbody tr {
+    display: block;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+  }
+  .responsive-table td {
+    display: grid;
+    grid-template-columns: minmax(80px, 0.65fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 12px;
+  }
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .responsive-table td > * {
+    min-width: 0;
+  }
+  .responsive-table td small {
+    grid-column: 2;
+    margin-top: 0;
+    font-size: 11px;
+  }
+  .responsive-table td strong {
+    font-size: 13px;
+  }
+  .responsive-table td .badge {
+    justify-self: start;
+    white-space: normal;
+    font-size: 11px;
+  }
+  .responsive-table td:last-child {
+    border: 0;
+  }
+  .table-scroll:has(.responsive-table) {
+    margin: 0;
+    overflow: visible;
+    max-width: 100%;
+  }
+
+  .agenda-page .agenda-header {
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .agenda-page .agenda-header > .btn {
+    min-height: 44px !important;
+    font-size: 12px !important;
+    width: 100%;
+  }
+  .agenda-page .agenda-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+  }
+  .agenda-page .agenda-date-nav {
+    justify-content: flex-end;
+    gap: 0;
+  }
+  .agenda-page .agenda-date-picker {
+    flex: 1;
+    width: auto;
+    font-size: 12px;
+  }
+  .agenda-page .agenda-nav-button {
+    width: 36px;
+    min-height: 44px;
+    flex-shrink: 0;
+  }
+  .agenda-page .agenda-today {
+    min-height: 44px;
+  }
+  .agenda-page .agenda-view-toggle {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+  .agenda-page .agenda-view-toggle button {
+    flex: 1;
+    min-height: 44px;
+    font-size: 13px;
+  }
+  .agenda-page .agenda-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: 10px;
+  }
+  .agenda-page .agenda-search {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: none;
+  }
+  .agenda-page .agenda-filters select {
+    max-width: 100%;
+    width: 100%;
+    padding: 10px 6px;
+  }
+  .agenda-page .agenda-free-toggle {
+    min-height: 46px;
+    white-space: normal;
+    font-size: 12px;
+  }
+  .agenda-page .agenda-context > span {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .agenda-page .agenda-calendar-grid {
+    grid-template-columns: 44px repeat(
+        var(--calendar-columns),
+        minmax(125px, 1fr)
+      );
+  }
+  .calendar-scroll-hint {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin: 12px 0 8px;
+  }
+  .daily .calendar-scroll-hint {
+    display: none;
+  }
+  .agenda-page .agenda-legend {
+    gap: 10px 14px;
+  }
+  .agenda-page .agenda-legend-item {
+    font-size: 11px;
+  }
+  .agenda-page .agenda-footer > small {
+    font-size: 11px;
+    line-height: 1.7;
+  }
+  .agenda-page .agenda-column-heading {
+    min-height: 76px;
+  }
+  .agenda-page .agenda-column-heading > span {
+    font-size: 10px;
+  }
+  .agenda-page .agenda-event {
+    font-size: 12px;
+  }
+  .agenda-page .agenda-free-slot {
+    min-width: 60px;
+    min-height: 44px;
+    font-size: 12px;
+  }
+
+  .login-side {
+    min-height: calc(100dvh - 80px);
+    padding: 24px 20px max(24px, env(safe-area-inset-bottom));
+  }
+  .login-story {
+    padding: max(20px, env(safe-area-inset-top)) 20px 20px;
+  }
+  .login-story > .brand {
+    font-size: 14px;
+  }
+  .login-back,
+  .login-card > p,
+  .login-card label {
+    font-size: 13px;
+  }
+  .login-secure,
+  .login-foot {
+    font-size: 11px;
+  }
+  .login-card h2 {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero h1 {
+    font-size: 34px;
+  }
+  .hero-highlight {
+    width: 52px;
+  }
+  .hero .hero-caption {
+    font-size: 11px;
+  }
+  .service-card {
+    min-height: 170px;
+    padding: 14px 11px;
+  }
+  .service-name {
+    font-size: 16px;
+  }
+  .form-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .history-actions > .btn {
+    flex-basis: 100%;
+  }
+  .stat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stat-card > strong {
+    font-size: 27px;
+  }
+  .admin-header .breadcrumb {
+    font-size: 10px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .sidebar {
+    padding-block: 16px;
+  }
+  .sidebar > .brand {
+    margin-bottom: 18px;
+  }
+  .workspace {
+    margin-bottom: 16px;
+  }
+  .agenda-page .agenda-calendar-scroll {
+    min-height: 180px;
+    max-height: 70dvh;
+  }
+  .dialog {
+    max-height: calc(100dvh - 16px);
+  }
+  .dialog-head,
+  .dialog-foot {
+    padding-block: 10px;
+  }
+  .login-card {
+    margin-block: 24px;
+  }
+}
+
+@media (hover: none) {
+  .btn:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+    min-height: 46px;
+  }
+  .nav-link,
+  .icon-btn,
+  .text-btn,
+  .agenda-page .agenda-nav-button,
+  .agenda-page .agenda-today,
+  .agenda-page .agenda-view-toggle button {
+    min-height: 44px;
+  }
+}
