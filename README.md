@@ -127,7 +127,7 @@ As preferências são salvas no Supabase, e o sinal Realtime existente atualiza 
 
 Logos aceitam PNG, JPG e WebP de até 2 MB. O bucket `barber-branding` permite leitura pública dessas imagens; inserção e remoção exigem o proprietário verificado e sua pasta pessoal. Os arquivos usam nomes únicos, sem sobrescrita. As preferências privadas e as credenciais não são expostas ao cliente.
 
-A migração `20261005171851_visual_identity.sql` foi aplicada ao projeto conectado. Os testes específicos estão em `tests/branding.test.mjs` e `tests/branding.sql`; os dados temporários de SQL são revertidos.
+A migração `20261005173349_visual_identity.sql` foi aplicada ao projeto conectado. Os testes específicos estão em `tests/branding.test.mjs` e `tests/branding.sql`; os dados temporários de SQL são revertidos.
 
 ## Destaque da página inicial
 
@@ -166,3 +166,6 @@ As seis reservas que ocupavam a agenda de hoje em diante foram normalizadas sem 
 ## Lembretes automáticos
 
 O cron do Supabase roda a cada minuto e envia lembretes de 30 minutos mesmo com o painel fechado. Conecte uma conta real em **Configurações → Conectar WhatsApp**. O modelo de aviso ao barbeiro é opcional; a conexão de lembretes não depende dele. Consulte [docs/whatsapp.md](docs/whatsapp.md) para requisitos e limites. `npm test` inclui um Postgres isolado em memória (PGlite), que executa a migration de lembretes e valida fila, mudanças de reserva, permissões e webhook sem tocar nos registros de produção nem enviar mensagens externas.
+# Atualização de 08/10/2026
+
+Reservas de uma hora preservadas; serviços longos recebem avisos e podem ter tempo adicional bloqueado pelo proprietário. A atualização corrige prazo de alterações, recebimentos antecipados, recuperação do histórico, proteção com TOTP, limites por celular, saúde da fila e migrations. Consulte [correções e validações](docs/corrections-2026-10-08.md) para os testes e as configurações externas ainda necessárias.

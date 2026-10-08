@@ -13,11 +13,12 @@ export function templateParameters(job: Job, siteUrl = 'https://teste-gpt-autono
 export async function runQueue(client: any, config: WhatsAppConfig, fetcher: typeof fetch = fetch, siteUrl?: string) {
   const common = config.access_token && config.phone_number_id && config.sender_phone && config.graph_version;
   const kinds = common ? [...(config.reminder_template ? ['reminder'] : []), ...(config.owner_template ? ['new','cancel','reschedule'] : [])] : [];
-  if (!kinds.length) return { configured: false, processed: 0 };
   async function queue(action: string, payload: any = {}) {
     const { data, error } = await client.rpc('barber_queue', { p_action: action, p_payload: payload });
     if (error) throw error;return data;
   }
+  await queue('maintenance');
+  if (!kinds.length) return { configured: false, processed: 0 };
   if (kinds.includes('reminder') && config.automatic_enabled !== false) await queue('enqueue_reminders');
   const jobs = await queue('claim', { kinds, automatic_enabled: config.automatic_enabled !== false });
   let processed = 0;

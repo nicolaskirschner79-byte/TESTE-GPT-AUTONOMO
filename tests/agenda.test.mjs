@@ -76,7 +76,7 @@ test('vagas são opcionais, usam o servidor e status curtos mantêm símbolo e d
 });
 test('conclusão gratuita e recebimento de saldo respeitam status e não repetem pagamento', () => {
   for (const status of ['agendado','confirmado','em_atendimento']) {
-    assert.equal(canFinishBooking({status,total:35,paid:35}),false);
+    assert.equal(canFinishBooking({status,total:35,paid:35}),true);
     assert.equal(canFinishBooking({status,total:35,paid:20}),true);
     assert.equal(canFinishBooking({status,total:0,paid:0}),true);
   }

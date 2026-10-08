@@ -10,10 +10,10 @@ export function adminDataRequests(state, now = new Date()) {
   const barber_id = state.barber || null;
   if (state.page === 'bookings') {
     const range = agendaRange(state.agenda.day, state.agenda.view);
-    return { period: { from: range.from, to: range.to, barber_id: state.agenda.barber || null, include_agenda: true } };
+    return { period: { from: range.from, to: range.to, barber_id: state.agenda.barber || null, include_agenda: true, include_notifications: true } };
   }
-  const requests = { period: { from: state.from, to: state.to, barber_id } };
-  if (state.page === 'overview') requests.recent = { from: addDays(dayKey(now), -6), to: dayKey(now), barber_id };
+  const requests = { period: { from: state.from, to: state.to, barber_id, include_notifications: state.page === 'overview' } };
+  if (state.page === 'overview') requests.recent = { from: addDays(dayKey(now), -6), to: dayKey(now), barber_id, include_notifications: false };
   return requests;
 }
 

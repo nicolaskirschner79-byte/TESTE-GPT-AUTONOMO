@@ -41,12 +41,12 @@ test('lembrete funciona sem modelo de aviso ao barbeiro e não expõe segredo no
 });
 test('worker sem configuração não retira mensagens da fila',async()=>{
  const client=clientFixture();let sent=0;
- assert.deepEqual(await runQueue(client,{},async()=>{sent++;}),{configured:false,processed:0});assert.equal(sent,0);assert.equal(client.calls.length,0);
+ assert.deepEqual(await runQueue(client,{},async()=>{sent++;}),{configured:false,processed:0});assert.equal(sent,0);assert.deepEqual(client.calls.map(x=>x.action),['maintenance']);
 });
 test('worker enfileira automaticamente e envia seis parâmetros com id para webhook',async()=>{
  const client=clientFixture();let sent=0;
  const result=await runQueue(client,config,async(url,opts)=>{sent++;assert.ok(url.endsWith('/123456/messages'));const body=JSON.parse(opts.body);assert.equal(body.to,job.recipient);assert.equal(body.template.components[0].parameters.length,6);assert.ok(body.template.components[0].parameters[2].text.includes('10:00'));assert.equal(body.biz_opaque_callback_data,'job');return Response.json({messages:[{id:'wamid.ok'}]});});
- assert.equal(result.processed,1);assert.equal(sent,1);assert.equal(client.calls[0].action,'enqueue_reminders');
+ assert.equal(result.processed,1);assert.equal(sent,1);assert.deepEqual(client.calls.slice(0,2).map(x=>x.action),['maintenance','enqueue_reminders']);
  assert.deepEqual(client.calls.find(x=>x.action==='claim').payload.kinds,['reminder']);assert.equal(client.calls.at(-1).payload.status,'sent');
 });
 test('reserva invalidada entre claim e envio não recebe mensagem',async()=>{

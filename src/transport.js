@@ -9,6 +9,7 @@ export async function requestJson(url, options, { timeout = 15000, fetcher = fet
     if (!response.ok) {
       const error = new Error(result.error || 'Não foi possível concluir.');
       error.status = response.status;
+      error.code = result.code;
       throw error;
     }
     return result.data;

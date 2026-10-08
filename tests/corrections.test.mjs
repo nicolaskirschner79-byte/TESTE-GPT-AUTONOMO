@@ -10,8 +10,8 @@ import { integrationStatusMarkup } from '../src/integration-view.js';
 test('período passado não limita os recebimentos de hoje nem os últimos sete dias', async () => {
   const state={page:'overview',from:'2026-09-01',to:'2026-09-30',barber:'a'};
   const requests=adminDataRequests(state,new Date('2026-10-06T01:57:00Z'));
-  assert.deepEqual(requests.period,{from:'2026-09-01',to:'2026-09-30',barber_id:'a'});
-  assert.deepEqual(requests.recent,{from:'2026-09-29',to:'2026-10-05',barber_id:'a'});
+  assert.deepEqual(requests.period,{from:'2026-09-01',to:'2026-09-30',barber_id:'a',include_notifications:true});
+  assert.deepEqual(requests.recent,{from:'2026-09-29',to:'2026-10-05',barber_id:'a',include_notifications:false});
   const data={bookings:[],payments:[{created_at:'2026-10-05T15:00:00Z',kind:'payment',amount:35}],expenses:[]};
   const fetched=await Promise.all(Object.values(requests).map(async r=>({...data,payments:data.payments.filter(p=>p.created_at.slice(0,10)>=r.from&&p.created_at.slice(0,10)<=r.to)})));
   assert.equal(metrics(fetched[0],state.from,state.to).received,0);assert.equal(metrics(fetched[1],'2026-10-05','2026-10-05').received,35);
@@ -19,7 +19,7 @@ test('período passado não limita os recebimentos de hoje nem os últimos sete 
 });
 test('consultas da agenda e do financeiro mantêm intervalos independentes e rejeitam período inválido',()=>{
   const plan=adminDataRequests({page:'bookings',agenda:{day:'2026-12-31',view:'week',barber:'a'}});
-  assert.deepEqual(plan,{period:{from:'2026-12-28',to:'2027-01-03',barber_id:'a',include_agenda:true}});
+  assert.deepEqual(plan,{period:{from:'2026-12-28',to:'2027-01-03',barber_id:'a',include_agenda:true,include_notifications:true}});
   assert.throws(()=>validateFinancialPeriod('2026-10-06','2026-10-05'));
   assert.throws(()=>validateFinancialPeriod('','2026-10-05'));
   assert.throws(()=>validateFinancialPeriod('2024-01-01','2026-10-05'));

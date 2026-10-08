@@ -15,3 +15,14 @@
 .badge.concluido{background:var(--status-completed-bg);color:var(--status-completed)}
 .badge.cancelado{background:var(--status-cancelled-bg);color:var(--status-cancelled)}
 .badge.nao_compareceu{background:var(--status-absent-bg);color:var(--status-absent)}
+/* Regras de reserva e proteção do acesso. */
+.duration-notice{background:#fff5e7;border:1px solid #e7c78f;border-radius:12px;padding:14px;margin:16px 0;font-size:13px;line-height:1.5;color:#5c3c14}
+.duration-notice p{margin:5px 0 0}
+.history-access-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.history-detail small{display:block;margin-top:5px}
+.notification-pagination{display:flex;justify-content:space-between;gap:12px;margin-top:18px}
+.owner-challenge{max-width:480px;margin:10vh auto;padding:20px}
+.owner-challenge form{display:grid;gap:18px;margin:24px 0}
+.owner-challenge label{display:grid;gap:8px}
+.mfa-qr{display:block;width:220px;height:220px;max-width:100%;margin:20px auto;background:white}
+.mfa-secret{display:block;overflow-wrap:anywhere;padding:14px;background:#f3f3f3;margin:10px 0}

@@ -2,7 +2,7 @@ import { addDays, dayKey, localInstant, TIMEZONE } from './utils.js';
 
 export const PENDING_STATUSES = Object.freeze(['agendado', 'confirmado']);
 export const ACTIVE_STATUSES = Object.freeze([...PENDING_STATUSES, 'em_atendimento']);
-export const canFinishBooking = booking => (ACTIVE_STATUSES.includes(booking.status) && (Number(booking.paid) < Number(booking.total) || Number(booking.total) === 0)) || (booking.status === 'concluido' && Number(booking.paid) < Number(booking.total));
+export const canFinishBooking = booking => ACTIVE_STATUSES.includes(booking.status) || (booking.status === 'concluido' && Number(booking.paid) < Number(booking.total));
 export function agendaRange(day, view = 'day') {
   if (view !== 'week') return { from: day, to: day, days: [day] };
   const weekday = new Date(`${day}T12:00:00-03:00`).getUTCDay();
