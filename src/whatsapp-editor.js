@@ -16,7 +16,7 @@ export function whatsappConnectionFields(status) {
     <label>ID da conta WhatsApp Business (WABA)<input name="waba_id" inputmode="numeric" pattern="[0-9]{5,30}" required value="${escape(w.waba_id)}" placeholder="Ex.: 123456789012345"></label>
     <details class="wa-advanced"><summary>Configurações avançadas (normalmente não precisa alterar)</summary>
       <label>ID do telefone remetente — opcional, será localizado automaticamente<input name="phone_number_id" inputmode="numeric" pattern="[0-9]{5,30}" value="${escape(w.phone_number_id)}" placeholder="Detectar automaticamente"></label>
-      <label>Versão da API<input name="graph_version" required pattern="v[0-9]{1,3}\\.0" value="${escape(w.graph_version || 'v24.0')}"></label>
+      <label>Versão da API<input name="graph_version" required pattern="v[0-9]{1,3}\\.0" value="${escape(w.graph_version || 'v25.0')}"></label>
       <label>Nome do modelo aprovado de lembrete<input name="reminder_template" required pattern="[a-z0-9_]{1,100}" value="${escape(w.reminder_template || 'barber_booking_reminder')}"></label>
       <details class="whatsapp-help"><summary>Como criar o modelo de lembrete</summary><p>Na Meta, crie um modelo em português (Brasil), categoria utilidade, com seis parâmetros numerados no corpo. Depois aguarde a aprovação.</p><pre>Olá, {{1}}! Lembramos do seu atendimento na {{2}}.
 Horário: {{3}}.
