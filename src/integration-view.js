@@ -35,7 +35,9 @@ export function integrationStatusMarkup(
       : "WhatsApp: configuração pendente";
   const summary = ready
     ? `${whatsapp.automatic_enabled === false ? "Lembretes automáticos pausados." : "Lembretes automáticos programados para 30 minutos antes, somente para clientes que autorizaram."} Acompanhe os estados reais em Notificações.`
-    : "Os agendamentos continuam sendo salvos normalmente, mas os lembretes não serão enviados até concluir os itens obrigatórios abaixo.";
+    : whatsapp.owner_configured
+      ? "As reservas são salvas. Lembretes ao cliente ainda não podem ser enviados."
+      : "Os agendamentos são salvos, mas as mensagens ainda não podem ser enviadas até concluir os itens obrigatórios abaixo.";
   const healthMessage = worker
     ? `<p class="fine-print">Última verificação do processamento: ${escape(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" }).format(new Date(worker.last_checked_at)))}.${stale ? " Atenção: sem verificação recente. Confira o agendador do Supabase." : ""}${worker.last_error ? ` ${escape(worker.last_error)}` : ""}</p>`
     : '<p class="fine-print">O processamento ainda não registrou uma verificação de saúde.</p>';
