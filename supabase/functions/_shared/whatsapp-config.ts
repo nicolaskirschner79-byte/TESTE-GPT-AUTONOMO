@@ -77,7 +77,9 @@ export async function validateConnection(config: WhatsAppConfig, fetcher: typeof
   const phone = config.phone_number_id
     ? phones.data?.find((p: any) => p.id === config.phone_number_id)
     : phones.data?.[0];
-  if (!phone) throw new Error('Não encontramos um número ativo nesta conta. Confira o ID WABA e se há um telefone cadastrado no WhatsApp Business.');
+  if (!phone) throw new Error(config.phone_number_id
+    ? 'O telefone informado não pertence à conta WhatsApp Business indicada.'
+    : 'Não encontramos um número ativo nesta conta. Confira o ID WABA e se há um telefone cadastrado no WhatsApp Business.');
   config.phone_number_id = String(phone.id);
   for (const [index, [name, count]] of names.entries()) {
     if (!name) continue;
