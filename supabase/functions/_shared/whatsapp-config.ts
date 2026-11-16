@@ -74,8 +74,11 @@ export async function validateConnection(config: WhatsAppConfig, fetcher: typeof
     get(`${config.waba_id}/phone_numbers?fields=id,display_phone_number,verified_name&limit=100`),
     ...names.map(([name]) => name ? get(`${config.waba_id}/message_templates?name=${encodeURIComponent(name)}&fields=name,status,language,components,parameter_format&limit=100`) : null),
   ]);
-  const phone = phones.data?.find((p: any) => p.id === config.phone_number_id);
-  if (!phone) throw new Error('O telefone informado não pertence à conta WhatsApp Business indicada.');
+  const phone = config.phone_number_id
+    ? phones.data?.find((p: any) => p.id === config.phone_number_id)
+    : phones.data?.[0];
+  if (!phone) throw new Error('Não encontramos um número ativo nesta conta. Confira o ID WABA e se há um telefone cadastrado no WhatsApp Business.');
+  config.phone_number_id = String(phone.id);
   for (const [index, [name, count]] of names.entries()) {
     if (!name) continue;
     checkTemplate(templates[index]?.data?.find((t: any) => t.name === name && t.language === 'pt_BR'), count);
