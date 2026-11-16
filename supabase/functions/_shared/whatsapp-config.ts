@@ -44,8 +44,9 @@ export function configFromInput(input: Record<string, unknown>, existing: WhatsA
   }
   config.automatic_enabled = input.automatic_enabled !== false;
   if (config.access_token && !/^[A-Za-z0-9._|\-]+$/.test(config.access_token)) throw new Error('A autorização de envio contém caracteres inválidos. Copie apenas o token da Meta.');
-  if (!config.access_token || !/^\d{5,30}$/.test(config.phone_number_id ?? '') || !/^\d{5,30}$/.test(config.waba_id ?? '')) throw new Error('Informe a autorização de envio, o ID do telefone e o ID da conta WhatsApp Business.');
-  if (!/^v\d{1,3}\.0$/.test(config.graph_version ?? '')) throw new Error('Informe a versão da API exibida na Meta, por exemplo vXX.0.');
+  if (!config.access_token || (config.phone_number_id && !/^\\d{5,30}$/.test(config.phone_number_id)) || !/^\\d{5,30}$/.test(config.waba_id ?? '')) throw new Error('Informe o token de acesso e o ID da conta WhatsApp Business.');
+  config.graph_version = config.graph_version || 'v25.0';
+  if (!/^v\\d{1,3}\\.0$/.test(config.graph_version)) throw new Error('A versão da API está inválida.');
   if (!/^[a-z0-9_]{1,100}$/.test(config.reminder_template ?? '') || (config.owner_template && !/^[a-z0-9_]{1,100}$/.test(config.owner_template))) throw new Error('Use os nomes exatos dos modelos aprovados, com letras minúsculas, números e sublinhado.');
   return config;
 }
