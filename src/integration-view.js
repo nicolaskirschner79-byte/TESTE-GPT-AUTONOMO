@@ -30,7 +30,9 @@ export function integrationStatusMarkup(
 
   const headline = ready
     ? "WhatsApp: conexão de lembretes configurada"
-    : "WhatsApp: configuração de envio pendente";
+    : whatsapp.owner_configured
+      ? "WhatsApp: avisos ao barbeiro configurados; lembretes pendentes"
+      : "WhatsApp: configuração pendente";
   const summary = ready
     ? `${whatsapp.automatic_enabled === false ? "Lembretes automáticos pausados." : "Lembretes automáticos programados para 30 minutos antes, somente para clientes que autorizaram."} Acompanhe os estados reais em Notificações.`
     : "Os agendamentos continuam sendo salvos normalmente, mas os lembretes não serão enviados até concluir os itens obrigatórios abaixo.";
