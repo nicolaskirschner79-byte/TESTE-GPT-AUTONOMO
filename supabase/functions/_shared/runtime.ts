@@ -1,7 +1,8 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.117.2';
 
 export const cors = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://agenda-tech-beta.vercel.app',
+  'Vary': 'Origin',
   'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-device-token',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Cache-Control': 'no-store',
