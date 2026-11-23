@@ -7,6 +7,8 @@ const actions = new Set(['catalog','slots','session','restore','mine','book','ca
 const publicActions = new Set(['catalog','slots','session','restore','mine','book','cancel','reschedule']);
 
 Deno.serve(async req => {
+  const origin = req.headers.get('origin');
+  if (origin && origin !== 'https://agenda-tech-beta.vercel.app') return json({ error: 'Origem não permitida.' }, 403);
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'Método não permitido.' }, 405);
   // verify_jwt=false: autorização explícita por chave pública + sessão Auth ou chave do dispositivo.
