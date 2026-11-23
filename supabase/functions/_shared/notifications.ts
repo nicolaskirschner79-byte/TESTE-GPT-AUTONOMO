@@ -18,5 +18,5 @@ export function connectionStatus(config: WhatsAppConfig) {
   return { whatsapp: { ...notificationStatus(key => env[key]).whatsapp, ...publicConfig(config) } };
 }
 export async function processQueue(client = db()) {
-  return runQueue(client, await loadWhatsAppConfig(client), fetch, Deno.env.get('PUBLIC_SITE_URL') || 'https://teste-gpt-autonomo.vercel.app/');
+  return runQueue(client, await loadWhatsAppConfig(client), fetch, Deno.env.get('PUBLIC_SITE_URL') || 'https://agenda-tech-beta.vercel.app/');
 }
