@@ -3,7 +3,7 @@ type Job = { id: string; recipient: string; kind: string; attempts: number; payl
 const displayDate = (instant: string) => new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' }).format(new Date(instant));
 const money = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 
-export function templateParameters(job: Job, siteUrl = 'https://teste-gpt-autonomo.vercel.app/') {
+export function templateParameters(job: Job, siteUrl = 'https://agenda-tech-beta.vercel.app/') {
   const b = job.payload.booking;
   const services = (b.items ?? []).map((i: any) => i.name).join(', ');
   if (job.kind === 'reminder') return [b.customer_name, job.payload.shop_name, displayDate(b.starts_at), services, b.barber_name, siteUrl];
