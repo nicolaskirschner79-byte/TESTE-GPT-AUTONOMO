@@ -20,7 +20,7 @@ Deno.serve(async req => {
     // pg_net tem timeout curto. A fila continua em segundo plano no servidor.
     EdgeRuntime.waitUntil((async () => {
       try {
-        const result = await runQueue(client, config, fetch, Deno.env.get('PUBLIC_SITE_URL') || 'https://teste-gpt-autonomo.vercel.app/');
+        const result = await runQueue(client, config, fetch, Deno.env.get('PUBLIC_SITE_URL') || 'https://agenda-tech-beta.vercel.app/');
         const { error } = await client.rpc('barber_health', { p_action: 'heartbeat', p_payload: result });
         if (error) throw error;
       } catch {
